@@ -25,14 +25,15 @@
     --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; max-width: 100%; }
 
   body {
     background-color: var(--bg-color);
     color: var(--text-primary);
     font-family: var(--font-sans);
     min-height: 100vh;
-    padding: 10px;
+    padding: 6px;
+    overflow-x: hidden;
     background-image: 
       radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.8) 0%, rgba(3, 7, 18, 1) 100%),
       linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
@@ -40,17 +41,17 @@
     background-size: 100% 100%, 20px 20px, 20px 20px;
   }
 
-  .container { max-width: 1450px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  .container { width: 100%; max-width: 1450px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
 
   header {
     background: var(--panel-bg);
     border: 1px solid var(--neon-blue);
     box-shadow: 0 0 10px var(--neon-glow);
-    padding: 12px 15px;
+    padding: 8px 10px;
     border-radius: 4px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
 
   @media (min-width: 768px) {
@@ -62,100 +63,122 @@
     }
   }
 
-  .system-title { font-size: 1rem; font-weight: 900; letter-spacing: 2px; color: var(--neon-blue); word-break: break-all; }
+  .system-title { font-size: 0.85rem; font-weight: 900; letter-spacing: 1px; color: var(--neon-blue); word-break: break-all; }
   @media (min-width: 768px) { .system-title { font-size: 1.2rem; letter-spacing: 3px; } }
 
-  .system-status { font-family: var(--font-mono); font-size: 0.75rem; color: var(--neon-green); display: flex; align-items: center; gap: 6px; }
+  .system-status { font-family: var(--font-mono); font-size: 0.65rem; color: var(--neon-green); display: flex; align-items: center; gap: 6px; }
 
-  /* 3カラムからレスポンシブへ完全移行 */
-  .grid-main { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  .grid-main { display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; }
   @media (min-width: 1024px) { 
     .grid-main { grid-template-columns: 320px 1fr 320px; gap: 20px; } 
   }
 
   .panel {
     background: var(--panel-bg); border: 1px solid var(--panel-border);
-    border-radius: 4px; padding: 12px; position: relative; backdrop-filter: blur(8px);
+    border-radius: 4px; padding: 8px; position: relative; backdrop-filter: blur(8px);
     box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    overflow: hidden;
   }
   @media (min-width: 768px) { .panel { padding: 20px; } }
 
   .panel-title {
-    font-size: 0.9rem; font-weight: 700; color: var(--neon-blue); letter-spacing: 1px;
-    border-bottom: 1px solid rgba(0, 240, 255, 0.2); padding-bottom: 8px; margin-bottom: 12px;
+    font-size: 0.8rem; font-weight: 700; color: var(--neon-blue); letter-spacing: 1px;
+    border-bottom: 1px solid rgba(0, 240, 255, 0.2); padding-bottom: 5px; margin-bottom: 8px;
     display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px;
   }
   @media (min-width: 768px) { .panel-title { font-size: 1rem; letter-spacing: 2px; padding-bottom: 10px; margin-bottom: 15px; } }
 
   /* Status UI */
-  .player-card { text-align: center; margin-bottom: 12px; }
-  .avatar-frame { width: 60px; height: 60px; margin: 0 auto 6px; border: 2px solid var(--neon-blue); border-radius: 50%; padding: 2px; box-shadow: 0 0 10px var(--neon-glow); }
+  .player-card { text-align: center; margin-bottom: 8px; }
+  .avatar-frame { width: 50px; height: 50px; margin: 0 auto 6px; border: 2px solid var(--neon-blue); border-radius: 50%; padding: 2px; box-shadow: 0 0 10px var(--neon-glow); }
   @media (min-width: 768px) { .avatar-frame { width: 70px; height: 70px; margin-bottom: 8px; } }
-  .avatar-inner { width: 100%; height: 100%; background: #0f172a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+  .avatar-inner { width: 100%; height: 100%; background: #0f172a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+  @media (min-width: 768px) { .avatar-inner { font-size: 1.5rem; } }
   
-  .player-name-box { display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: bold; font-size: 1rem; flex-wrap: wrap; }
-  .player-title-box { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.75rem; color: var(--neon-purple); margin-top: 4px; font-weight: bold; flex-wrap: wrap; }
+  .player-name-box { display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: bold; font-size: 0.85rem; flex-wrap: wrap; }
+  @media (min-width: 768px) { .player-name-box { font-size: 1rem; } }
   
-  .edit-btn { background: none; border: 1px solid var(--neon-blue); color: var(--neon-blue); border-radius: 3px; padding: 2px 6px; font-size: 0.65rem; cursor: pointer; }
+  .player-title-box { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.65rem; color: var(--neon-purple); margin-top: 4px; font-weight: bold; flex-wrap: wrap; }
+  @media (min-width: 768px) { .player-title-box { font-size: 0.75rem; } }
+  
+  .edit-btn { background: none; border: 1px solid var(--neon-blue); color: var(--neon-blue); border-radius: 3px; padding: 2px 4px; font-size: 0.55rem; cursor: pointer; }
   .edit-btn:hover { background: var(--neon-blue); color: #000; }
 
-  .exp-container { margin: 12px 0; }
-  .exp-label { display: flex; justify-content: space-between; font-size: 0.75rem; font-family: var(--font-mono); color: var(--text-dim); margin-bottom: 4px; }
-  .bar-bg { height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.3); }
+  .exp-container { margin: 8px 0; }
+  .exp-label { display: flex; justify-content: space-between; font-size: 0.65rem; font-family: var(--font-mono); color: var(--text-dim); margin-bottom: 3px; }
+  @media (min-width: 768px) { .exp-label { font-size: 0.75rem; margin-bottom: 4px; } }
+  .bar-bg { height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.3); }
   @media (min-width: 768px) { .bar-bg { height: 10px; } }
   .bar-fill { height: 100%; background: linear-gradient(90deg, #00f0ff, #a855f7); width: 0%; box-shadow: 0 0 10px var(--neon-blue); transition: width 0.5s ease; }
 
-  .stats-list { display: flex; flex-direction: column; gap: 6px; }
+  .stats-list { display: flex; flex-direction: column; gap: 4px; }
   @media (min-width: 768px) { .stats-list { gap: 8px; } }
-  .stat-item { display: grid; grid-template-columns: 35px 1fr 1.2fr; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 6px 10px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.05); }
+  .stat-item { display: grid; grid-template-columns: 30px 1fr 1.2fr; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 4px 6px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.05); }
   @media (min-width: 768px) { .stat-item { grid-template-columns: 40px 1fr 1fr; padding: 8px 12px; } }
-  .stat-code { font-weight: bold; color: var(--neon-blue); font-family: var(--font-mono); font-size: 0.85rem; }
-  .stat-name { font-size: 0.7rem; color: var(--text-dim); }
+  .stat-code { font-weight: bold; color: var(--neon-blue); font-family: var(--font-mono); font-size: 0.75rem; }
+  @media (min-width: 768px) { .stat-code { font-size: 0.85rem; } }
+  .stat-name { font-size: 0.6rem; color: var(--text-dim); }
   @media (min-width: 768px) { .stat-name { font-size: 0.75rem; } }
-  .stat-val-group { display: flex; align-items: center; justify-content: flex-end; gap: 3px; font-family: var(--font-mono); font-size: 0.75rem; }
+  .stat-val-group { display: flex; align-items: center; justify-content: flex-end; gap: 2px; font-family: var(--font-mono); font-size: 0.65rem; }
   @media (min-width: 768px) { .stat-val-group { font-size: 0.85rem; gap: 4px; } }
-  .stat-val { font-size: 0.85rem; font-weight: 800; }
+  .stat-val { font-size: 0.75rem; font-weight: 800; }
   @media (min-width: 768px) { .stat-val { font-size: 0.95rem; } }
-  .stat-buff { font-size: 0.65rem; color: var(--neon-green); font-weight: bold; }
-  .stat-target { font-size: 0.7rem; color: var(--neon-gold); }
+  .stat-buff { font-size: 0.55rem; color: var(--neon-green); font-weight: bold; }
+  .stat-target { font-size: 0.6rem; color: var(--neon-gold); }
   @media (min-width: 768px) { .stat-target { font-size: 0.8rem; } }
 
   /* Tabs UI */
-  .tab-buttons { display: flex; gap: 4px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
-  .tab-btn { flex: 1; min-width: 65px; padding: 7px 4px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--panel-border); color: var(--text-dim); font-size: 0.65rem; font-weight: bold; cursor: pointer; border-radius: 3px; white-space: nowrap; text-align: center; }
-  @media (min-width: 768px) { .tab-btn { font-size: 0.7rem; padding: 8px; min-width: 70px; } }
+  .tab-buttons { display: flex; gap: 3px; margin-bottom: 8px; overflow-x: auto; padding-bottom: 3px; -webkit-overflow-scrolling: touch; scrollbar-width: none; width: 100%; }
+  .tab-buttons::-webkit-scrollbar { display: none; }
+  .tab-btn { flex: 0 0 auto; min-width: 50px; padding: 5px 6px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--panel-border); color: var(--text-dim); font-size: 0.55rem; font-weight: bold; cursor: pointer; border-radius: 3px; white-space: nowrap; text-align: center; }
+  @media (min-width: 768px) { .tab-btn { flex: 1; font-size: 0.7rem; padding: 8px; min-width: 65px; } }
   .tab-btn.active { background: var(--neon-blue); color: #000; box-shadow: 0 0 10px var(--neon-glow); border-color: var(--neon-blue); }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
+  /* Manual Tab Content Styles */
+  .manual-body { font-size: 0.7rem; line-height: 1.4; color: var(--text-primary); display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; padding-right: 2px; }
+  @media (min-width: 768px) { .manual-body { font-size: 0.8rem; line-height: 1.6; max-height: 420px; } }
+  .manual-section-title { font-size: 0.75rem; font-weight: bold; color: var(--neon-blue); border-left: 3px solid var(--neon-blue); padding-left: 4px; margin-top: 4px; }
+  @media (min-width: 768px) { .manual-section-title { font-size: 0.85rem; padding-left: 6px; margin-top: 6px; } }
+  .manual-text { color: var(--text-dim); font-size: 0.65rem; }
+  @media (min-width: 768px) { .manual-text { font-size: 0.75rem; } }
+  .manual-list { padding-left: 12px; display: flex; flex-direction: column; gap: 3px; font-size: 0.65rem; color: var(--text-dim); }
+  @media (min-width: 768px) { .manual-list { padding-left: 16px; gap: 4px; font-size: 0.75rem; } }
+  .manual-list li strong { color: var(--text-primary); }
+
   /* Task Item UI */
-  .item-card { display: flex; align-items: flex-start; gap: 8px; background: rgba(15, 23, 42, 0.4); padding: 8px 10px; margin-bottom: 8px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; }
+  .item-card { display: flex; align-items: flex-start; gap: 6px; background: rgba(15, 23, 42, 0.4); padding: 6px; margin-bottom: 5px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; width: 100%; flex-wrap: wrap; }
   @media (min-width: 768px) { 
-    .item-card { align-items: center; padding: 10px; gap: 10px; } 
+    .item-card { align-items: center; padding: 10px; gap: 10px; margin-bottom: 8px; flex-wrap: nowrap; } 
   }
   .item-card.completed { border-color: rgba(0, 240, 255, 0.3); background: rgba(0, 240, 255, 0.05); }
   .item-card.completed .item-title { text-decoration: line-through; color: var(--text-dim); }
-  .item-time { font-family: var(--font-mono); font-size: 0.75rem; color: var(--neon-gold); font-weight: bold; min-width: 45px; }
+  .item-time { font-family: var(--font-mono); font-size: 0.65rem; color: var(--neon-gold); font-weight: bold; min-width: 36px; }
   @media (min-width: 768px) { .item-time { font-size: 0.8rem; min-width: 50px; } }
-  .item-title { font-size: 0.8rem; flex-grow: 1; word-break: break-all; }
-  @media (min-width: 768px) { .item-title { font-size: 0.85rem; } }
-  .item-rewards { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; width: 100%; margin-top: 4px; }
+  .item-title { font-size: 0.7rem; flex-grow: 1; word-break: break-all; width: calc(100% - 60px); }
+  @media (min-width: 768px) { .item-title { font-size: 0.85rem; width: auto; } }
+  .item-rewards { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; width: 100%; margin-top: 3px; }
   @media (min-width: 768px) { .item-rewards { width: auto; margin-top: 0; gap: 6px; } }
-  .item-exp { font-family: var(--font-mono); font-size: 0.7rem; color: var(--neon-purple); font-weight: bold; }
-  .stat-badge { font-family: var(--font-mono); font-size: 0.65rem; background: rgba(168, 85, 247, 0.2); border: 1px solid var(--neon-purple); color: #e9d5ff; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
-  .penalty-badge { font-family: var(--font-mono); font-size: 0.65rem; background: rgba(239, 68, 68, 0.2); border: 1px solid var(--neon-red); color: #fca5a5; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
-  .checkbox { width: 20px; height: 20px; border: 2px solid var(--neon-blue); border-radius: 3px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
-  @media (min-width: 768px) { .checkbox { width: 18px; height: 18px; margin-top: 0; } }
-  .item-card.completed .checkbox::after { content: '✓'; color: var(--neon-blue); font-weight: bold; font-size: 0.8rem; }
+  .item-exp { font-family: var(--font-mono); font-size: 0.6rem; color: var(--neon-purple); font-weight: bold; }
+  @media (min-width: 768px) { .item-exp { font-size: 0.7rem; } }
+  .stat-badge { font-family: var(--font-mono); font-size: 0.55rem; background: rgba(168, 85, 247, 0.2); border: 1px solid var(--neon-purple); color: #e9d5ff; padding: 1px 3px; border-radius: 3px; font-weight: bold; }
+  @media (min-width: 768px) { .stat-badge { font-size: 0.65rem; padding: 1px 4px; } }
+  .penalty-badge { font-family: var(--font-mono); font-size: 0.55rem; background: rgba(239, 68, 68, 0.2); border: 1px solid var(--neon-red); color: #fca5a5; padding: 1px 3px; border-radius: 3px; font-weight: bold; }
+  @media (min-width: 768px) { .penalty-badge { font-size: 0.65rem; padding: 1px 4px; } }
+  .checkbox { width: 16px; height: 16px; border: 2px solid var(--neon-blue); border-radius: 3px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; margin-left: auto; }
+  @media (min-width: 768px) { .checkbox { width: 18px; height: 18px; margin-top: 0; margin-left: 0; } }
+  .item-card.completed .checkbox::after { content: '✓'; color: var(--neon-blue); font-weight: bold; font-size: 0.7rem; }
   
   .delete-btn {
     background: rgba(239, 68, 68, 0.15);
     border: 1px solid var(--neon-red);
     color: var(--neon-red);
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     font-weight: bold;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -171,88 +194,88 @@
   }
 
   /* Map View */
-  #leaflet-map { width: 100%; height: 220px; border-radius: 6px; border: 2px solid var(--neon-blue); box-shadow: 0 0 10px var(--neon-glow); margin-bottom: 12px; background: #000; }
+  #leaflet-map { width: 100%; height: 180px; border-radius: 6px; border: 2px solid var(--neon-blue); box-shadow: 0 0 10px var(--neon-glow); margin-bottom: 8px; background: #000; }
   @media (min-width: 768px) { #leaflet-map { height: 280px; margin-bottom: 15px; } }
-  .botw-pin { background: rgba(10, 16, 31, 0.9); border: 2px solid var(--neon-blue); border-radius: 50%; text-align: center; line-height: 28px; font-size: 1rem; box-shadow: 0 0 10px var(--neon-blue); }
+  .botw-pin { background: rgba(10, 16, 31, 0.9); border: 2px solid var(--neon-blue); border-radius: 50%; text-align: center; line-height: 24px; font-size: 0.8rem; box-shadow: 0 0 10px var(--neon-blue); }
 
   /* Countdown UI */
-  .cd-card { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--panel-border); border-radius: 6px; padding: 12px; margin-bottom: 12px; text-align: center; }
-  .cd-target-name { font-size: 0.95rem; font-weight: bold; color: var(--neon-gold); margin-bottom: 4px; word-break: break-all; }
-  @media (min-width: 768px) { .cd-target-name { font-size: 1.1rem; } }
-  .cd-timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0; }
+  .cd-card { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--panel-border); border-radius: 6px; padding: 8px; margin-bottom: 8px; text-align: center; }
+  .cd-target-name { font-size: 0.8rem; font-weight: bold; color: var(--neon-gold); margin-bottom: 3px; word-break: break-all; }
+  @media (min-width: 768px) { .cd-target-name { font-size: 1.1rem; margin-bottom: 4px; } }
+  .cd-timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 6px 0; }
   @media (min-width: 768px) { .cd-timer-grid { gap: 8px; margin: 12px 0; } }
-  .cd-time-unit { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 4px; padding: 6px 2px; }
+  .cd-time-unit { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 4px; padding: 4px 2px; }
   @media (min-width: 768px) { .cd-time-unit { padding: 8px; } }
-  .cd-val { font-family: var(--font-mono); font-size: 1.1rem; font-weight: bold; color: var(--neon-blue); }
+  .cd-val { font-family: var(--font-mono); font-size: 0.85rem; font-weight: bold; color: var(--neon-blue); }
   @media (min-width: 768px) { .cd-val { font-size: 1.5rem; } }
-  .cd-lbl { font-size: 0.55rem; color: var(--text-dim); }
+  .cd-lbl { font-size: 0.45rem; color: var(--text-dim); }
   @media (min-width: 768px) { .cd-lbl { font-size: 0.65rem; } }
 
   /* Forms & Inputs */
-  .cd-form { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-  .sys-input { background: #000; border: 1px solid var(--panel-border); color: #fff; padding: 8px; border-radius: 3px; font-family: var(--font-mono); font-size: 0.8rem; width: 100%; }
-  .sys-btn { padding: 8px; background: rgba(0, 240, 255, 0.2); border: 1px solid var(--neon-blue); color: var(--neon-blue); font-weight: bold; cursor: pointer; border-radius: 3px; font-size: 0.75rem; text-align: center; }
-  @media (min-width: 768px) { .sys-btn { font-size: 0.8rem; } }
+  .cd-form { display: flex; flex-direction: column; gap: 5px; margin-top: 5px; }
+  .sys-input { background: #000; border: 1px solid var(--panel-border); color: #fff; padding: 6px; border-radius: 3px; font-family: var(--font-mono); font-size: 0.7rem; width: 100%; max-width: 100%; }
+  @media (min-width: 768px) { .sys-input { padding: 8px; font-size: 0.8rem; } }
+  .sys-btn { padding: 6px; background: rgba(0, 240, 255, 0.2); border: 1px solid var(--neon-blue); color: var(--neon-blue); font-weight: bold; cursor: pointer; border-radius: 3px; font-size: 0.65rem; text-align: center; }
+  @media (min-width: 768px) { .sys-btn { padding: 8px; font-size: 0.8rem; } }
   .sys-btn:hover { background: var(--neon-blue); color: #000; }
   .sys-btn.danger { background: rgba(239, 68, 68, 0.2); border-color: var(--neon-red); color: var(--neon-red); }
   .sys-btn.danger:hover { background: var(--neon-red); color: #000; }
   .sys-btn:disabled, .sys-btn.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 
-  .area-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
-  @media (min-width: 480px) { .area-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; } }
-  .area-card-mini { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--panel-border); border-radius: 4px; padding: 8px; text-align: center; }
-  .area-card-mini .icon { font-size: 1.3rem; margin-bottom: 2px; }
-  .area-card-mini .title { font-size: 0.7rem; font-weight: bold; color: var(--neon-blue); }
+  .area-grid { display: grid; grid-template-columns: 1fr; gap: 5px; }
+  @media (min-width: 480px) { .area-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; } }
+  .area-card-mini { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--panel-border); border-radius: 4px; padding: 6px; text-align: center; }
+  .area-card-mini .icon { font-size: 1rem; margin-bottom: 2px; }
+  .area-card-mini .title { font-size: 0.6rem; font-weight: bold; color: var(--neon-blue); }
 
   /* Timer UI */
-  .timer-display { font-family: var(--font-mono); font-size: 2.2rem; font-weight: 900; text-align: center; color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-glow); margin: 8px 0; }
+  .timer-display { font-family: var(--font-mono); font-size: 1.8rem; font-weight: 900; text-align: center; color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-glow); margin: 5px 0; }
   @media (min-width: 768px) { .timer-display { font-size: 2.8rem; text-shadow: 0 0 15px var(--neon-glow); margin: 10px 0; } }
-  .timer-preset { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; }
-  .btn-preset { padding: 4px 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--neon-purple); color: var(--neon-purple); border-radius: 3px; font-size: 0.7rem; font-family: var(--font-mono); cursor: pointer; }
-  .btn-timer-ctrl { width: 100%; padding: 8px; font-weight: bold; border-radius: 3px; border: none; cursor: pointer; font-size: 0.8rem; }
-  @media (min-width: 768px) { .btn-timer-ctrl { font-size: 0.85rem; } }
+  .timer-preset { display: flex; gap: 4px; justify-content: center; margin-bottom: 6px; }
+  .btn-preset { padding: 2px 6px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--neon-purple); color: var(--neon-purple); border-radius: 3px; font-size: 0.6rem; font-family: var(--font-mono); cursor: pointer; }
+  .btn-timer-ctrl { width: 100%; padding: 6px; font-weight: bold; border-radius: 3px; border: none; cursor: pointer; font-size: 0.7rem; }
+  @media (min-width: 768px) { .btn-timer-ctrl { padding: 8px; font-size: 0.85rem; } }
   .btn-start { background: var(--neon-blue); color: #000; box-shadow: 0 0 10px var(--neon-glow); }
   .btn-stop { background: var(--neon-red); color: #fff; }
 
   /* Log Terminal */
-  .log-terminal { background: #000; border: 1px solid rgba(0, 240, 255, 0.3); font-family: var(--font-mono); font-size: 0.7rem; padding: 8px; height: 90px; overflow-y: auto; color: var(--neon-green); border-radius: 4px; margin-top: 12px; }
+  .log-terminal { background: #000; border: 1px solid rgba(0, 240, 255, 0.3); font-family: var(--font-mono); font-size: 0.6rem; padding: 6px; height: 75px; overflow-y: auto; color: var(--neon-green); border-radius: 4px; margin-top: 8px; }
   @media (min-width: 768px) { .log-terminal { font-size: 0.75rem; height: 100px; padding: 10px; margin-top: 15px; } }
-  .log-line { margin-bottom: 3px; word-break: break-all; }
+  .log-line { margin-bottom: 2px; word-break: break-all; }
   .log-line.system { color: var(--neon-blue); }
   .log-line.warn { color: var(--neon-gold); }
   .log-line.danger { color: var(--neon-red); }
 
-  .target-setting-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin-top: 6px; }
-  .target-setting-grid input { width: 100%; padding: 3px 2px; text-align: center; font-size: 0.65rem; background: rgba(0,0,0,0.8); color: var(--neon-gold); border: 1px solid var(--panel-border); font-family: var(--font-mono); border-radius: 2px; }
+  .target-setting-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; margin-top: 4px; }
+  .target-setting-grid input { width: 100%; padding: 2px; text-align: center; font-size: 0.55rem; background: rgba(0,0,0,0.8); color: var(--neon-gold); border: 1px solid var(--panel-border); font-family: var(--font-mono); border-radius: 2px; }
 
-  /* Internal Auto Generator Box */
-  .internal-gen-box { margin-top: 12px; background: rgba(0,240,255,0.03); padding: 10px; border: 1px solid rgba(0,240,255,0.3); border-radius: 4px; }
-  .internal-gen-title { font-size: 0.75rem; color: var(--neon-blue); font-weight: bold; margin-bottom: 5px; }
+  .internal-gen-box { margin-top: 8px; background: rgba(0,240,255,0.03); padding: 6px; border: 1px solid rgba(0,240,255,0.3); border-radius: 4px; }
+  .internal-gen-title { font-size: 0.65rem; color: var(--neon-blue); font-weight: bold; margin-bottom: 4px; }
 
-  /* 鬼畜モード切り替えスイッチエリア */
   .hardcore-switch-box {
-    margin-top: 10px;
+    margin-top: 6px;
     background: rgba(239, 68, 68, 0.08);
     border: 1px solid var(--neon-red);
-    padding: 8px 10px;
+    padding: 6px;
     border-radius: 4px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
   }
   .hardcore-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     font-weight: bold;
     color: var(--neon-red);
   }
+  @media (min-width: 768px) { .hardcore-header { font-size: 0.75rem; } }
   .switch-toggle {
     position: relative;
     display: inline-block;
-    width: 40px;
-    height: 20px;
+    width: 34px;
+    height: 16px;
     flex-shrink: 0;
   }
   .switch-toggle input { opacity: 0; width: 0; height: 0; }
@@ -262,81 +285,83 @@
     border: 1px solid #475569;
   }
   .slider:before {
-    position: absolute; content: ""; height: 14px; width: 14px; left: 2px; bottom: 2px;
+    position: absolute; content: ""; height: 10px; width: 10px; left: 2px; bottom: 2px;
     background-color: white; transition: .3s; border-radius: 50%;
   }
   input:checked + .slider { background-color: var(--neon-red); border-color: var(--neon-red); }
-  input:checked + .slider:before { transform: translateX(20px); }
+  input:checked + .slider:before { transform: translateX(18px); }
 
-  /* 🚨 ペナルティモーダル UI 🚨 */
+  .penalty-overlay, .modal-overlay, .survey-overlay {
+    box-sizing: border-box;
+  }
   .penalty-overlay {
     display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(15, 0, 0, 0.92); z-index: 9999; flex-direction: column;
-    align-items: center; justify-content: center; backdrop-filter: blur(10px); padding: 15px;
+    align-items: center; justify-content: center; backdrop-filter: blur(10px); padding: 10px;
     animation: flash-red 1s infinite alternate;
   }
   @keyframes flash-red {
-    0% { box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.4); }
+    0% { box-shadow: inset 0 0 20px rgba(239, 68, 68, 0.4); }
     100% { box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.8); }
   }
   .penalty-card {
     background: #000; border: 2px solid var(--neon-red); box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
-    width: 100%; max-width: 480px; padding: 20px; border-radius: 8px; text-align: center; font-family: var(--font-mono);
+    width: 100%; max-width: 450px; padding: 12px; border-radius: 8px; text-align: center; font-family: var(--font-mono);
   }
-  .penalty-title { color: var(--neon-red); font-size: 1.2rem; font-weight: 900; letter-spacing: 3px; margin-bottom: 8px; text-shadow: 0 0 8px var(--neon-red); }
-  @media (min-width: 768px) { .penalty-title { font-size: 1.5rem; letter-spacing: 4px; } }
-  .penalty-sub { font-size: 0.75rem; color: #fca5a5; margin-bottom: 15px; line-height: 1.4; }
+  @media (min-width: 768px) { .penalty-card { padding: 20px; } }
+  .penalty-title { color: var(--neon-red); font-size: 1rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px; text-shadow: 0 0 8px var(--neon-red); }
+  @media (min-width: 768px) { .penalty-title { font-size: 1.5rem; letter-spacing: 4px; margin-bottom: 8px; } }
+  .penalty-sub { font-size: 0.65rem; color: #fca5a5; margin-bottom: 10px; line-height: 1.3; }
   @media (min-width: 768px) { .penalty-sub { font-size: 0.85rem; margin-bottom: 20px; } }
-  .penalty-quest-box { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--neon-red); padding: 12px; border-radius: 4px; text-align: left; margin-bottom: 15px; color: #fff; font-size: 0.75rem; line-height: 1.6; }
+  .penalty-quest-box { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--neon-red); padding: 8px; border-radius: 4px; text-align: left; margin-bottom: 10px; color: #fff; font-size: 0.65rem; line-height: 1.4; }
   @media (min-width: 768px) { .penalty-quest-box { padding: 15px; font-size: 0.85rem; line-height: 1.8; margin-bottom: 20px; } }
 
-  /* 🏆 称号＆実績モーダル UI */
   .modal-overlay {
     display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0, 0, 0, 0.85); z-index: 9998; justify-content: center; align-items: center; backdrop-filter: blur(5px); padding: 10px;
+    background: rgba(0, 0, 0, 0.85); z-index: 9998; justify-content: center; align-items: center; backdrop-filter: blur(5px); padding: 8px;
   }
   .modal-card {
     background: var(--panel-bg); border: 2px solid var(--neon-purple); box-shadow: 0 0 20px var(--neon-purple);
-    width: 100%; max-width: 550px; padding: 15px; border-radius: 6px; max-height: 85vh; display: flex; flex-direction: column;
+    width: 100%; max-width: 520px; padding: 10px; border-radius: 6px; max-height: 85vh; display: flex; flex-direction: column;
   }
   @media (min-width: 768px) { .modal-card { padding: 20px; } }
-  .modal-header { font-size: 1rem; font-weight: 900; color: var(--neon-purple); letter-spacing: 1px; margin-bottom: 12px; border-bottom: 1px solid rgba(168, 85, 247, 0.3); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; gap: 5px; }
+  .modal-header { font-size: 0.85rem; font-weight: 900; color: var(--neon-purple); letter-spacing: 1px; margin-bottom: 8px; border-bottom: 1px solid rgba(168, 85, 247, 0.3); padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; gap: 5px; }
   @media (min-width: 768px) { .modal-header { font-size: 1.2rem; letter-spacing: 2px; margin-bottom: 15px; padding-bottom: 8px; } }
-  .title-list { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
-  .title-item { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; gap: 8px; }
-  @media (min-width: 480px) { .title-item { flex-direction: row; justify-content: space-between; align-items: center; } }
+  .title-list { overflow-y: auto; display: flex; flex-direction: column; gap: 5px; padding-right: 2px; }
+  .title-item { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 6px; border-radius: 4px; display: flex; flex-direction: column; gap: 4px; }
+  @media (min-width: 480px) { .title-item { flex-direction: row; justify-content: space-between; align-items: center; padding: 10px; } }
   .title-item.unlocked { border-color: var(--neon-purple); }
   .title-item.equipped { border-color: var(--neon-gold); background: rgba(251, 191, 36, 0.08); }
-  .title-info { display: flex; flex-direction: column; gap: 3px; }
-  .title-name-text { font-weight: bold; font-size: 0.85rem; color: #fff; }
+  .title-info { display: flex; flex-direction: column; gap: 2px; }
+  .title-name-text { font-weight: bold; font-size: 0.75rem; color: #fff; }
   @media (min-width: 768px) { .title-name-text { font-size: 0.95rem; } }
-  .title-desc { font-size: 0.7rem; color: var(--text-dim); }
-  .title-buff { font-size: 0.7rem; color: var(--neon-green); font-family: var(--font-mono); font-weight: bold; }
-  .title-lock-tag { font-size: 0.65rem; color: var(--neon-red); font-family: var(--font-mono); }
+  .title-desc { font-size: 0.6rem; color: var(--text-dim); }
+  @media (min-width: 768px) { .title-desc { font-size: 0.7rem; } }
+  .title-buff { font-size: 0.6rem; color: var(--neon-green); font-family: var(--font-mono); font-weight: bold; }
+  .title-lock-tag { font-size: 0.55rem; color: var(--neon-red); font-family: var(--font-mono); }
 
-  /* 📝 キャラクリエイト診断モーダル */
   .survey-overlay {
     display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(3, 7, 18, 0.95); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(8px); padding: 10px;
+    background: rgba(3, 7, 18, 0.95); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(8px); padding: 6px;
   }
   .survey-card {
     background: var(--panel-bg); border: 2px solid var(--neon-blue); box-shadow: 0 0 25px var(--neon-glow);
-    width: 100%; max-width: 720px; padding: 15px; border-radius: 6px; max-height: 92vh; display: flex; flex-direction: column; font-family: var(--font-sans);
+    width: 100%; max-width: 680px; padding: 10px; border-radius: 6px; max-height: 94vh; display: flex; flex-direction: column; font-family: var(--font-sans);
   }
   @media (min-width: 768px) { .survey-card { padding: 25px; } }
-  .survey-body { overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 4px; margin: 10px 0; }
+  .survey-body { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; margin: 6px 0; }
   @media (min-width: 768px) { .survey-body { gap: 15px; margin: 15px 0; } }
-  .survey-section { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--panel-border); padding: 10px; border-radius: 4px; }
+  .survey-section { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--panel-border); padding: 6px; border-radius: 4px; }
   @media (min-width: 768px) { .survey-section { padding: 12px; } }
-  .survey-section-title { font-size: 0.8rem; font-weight: bold; color: var(--neon-blue); margin-bottom: 6px; }
+  .survey-section-title { font-size: 0.7rem; font-weight: bold; color: var(--neon-blue); margin-bottom: 4px; }
   @media (min-width: 768px) { .survey-section-title { font-size: 0.9rem; margin-bottom: 8px; } }
-  .survey-option-label { display: flex; align-items: flex-start; gap: 6px; font-size: 0.75rem; margin-bottom: 6px; cursor: pointer; color: var(--text-primary); line-height: 1.4; }
-  @media (min-width: 768px) { .survey-option-label { align-items: center; font-size: 0.8rem; gap: 8px; } }
-  .survey-option-label input { accent-color: var(--neon-blue); width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; margin-top: 1px; }
+  .survey-option-label { display: flex; align-items: flex-start; gap: 6px; font-size: 0.65rem; margin-bottom: 4px; cursor: pointer; color: var(--text-primary); line-height: 1.3; }
+  @media (min-width: 768px) { .survey-option-label { align-items: center; font-size: 0.8rem; gap: 8px; margin-bottom: 6px; } }
+  .survey-option-label input { accent-color: var(--neon-blue); width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; margin-top: 1px; }
   @media (min-width: 768px) { .survey-option-label input { margin-top: 0; } }
   
   .autosave-indicator {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     color: var(--neon-green);
     font-family: var(--font-mono);
     display: flex;
@@ -350,9 +375,9 @@
 <div class="container">
   <header>
     <div class="system-title">⚔️ SOLO SYSTEM (SOLO LEVELING EDITION)</div>
-    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 5px;">
       <div id="autosave-status" class="autosave-indicator">💾 自動保存: 待機中</div>
-      <div class="system-status"><span style="width:8px;height:8px;background:var(--neon-green);border-radius:50%;display:inline-block;"></span> SYSTEM ACTIVE</div>
+      <div class="system-status"><span style="width:6px;height:6px;background:var(--neon-green);border-radius:50%;display:inline-block;"></span> SYSTEM ACTIVE</div>
     </div>
   </header>
 
@@ -361,7 +386,7 @@
     <div class="panel">
       <div class="panel-title">
         <span>◈ HUNTER STATUS</span>
-        <span id="rank-display" style="font-size:0.75rem; font-family:var(--font-mono); color:var(--neon-gold);">E-RANK</span>
+        <span id="rank-display" style="font-size:0.65rem; font-family:var(--font-mono); color:var(--neon-gold);">E-RANK</span>
       </div>
 
       <div class="player-card">
@@ -372,34 +397,32 @@
         </div>
         <div class="player-title-box">
           【<span id="player-title-display">見習い探求者</span>】
-          <button class="edit-btn" onclick="openTitleModal()">🏷️ 称号・実績</button>
+          <button class="edit-btn" onclick="openTitleModal()">🏷️ 称号</button>
         </div>
       </div>
 
-      <div style="margin-bottom: 10px; background: rgba(251, 191, 36, 0.08); border: 1px solid var(--neon-gold); padding: 8px; border-radius: 4px; text-align: center;">
-        <div style="font-size: 0.7rem; font-weight: bold; color: var(--neon-gold); margin-bottom: 4px;" id="rankup-status-text">🏆 次回ランク: D級 (必要ステータス: 各45)</div>
-        <button class="sys-btn" style="width: 100%; font-size: 0.7rem; background: rgba(251, 191, 36, 0.2); border-color: var(--neon-gold); color: var(--neon-gold);" onclick="tryRankUp()">⭐ 昇格試験 (ランクアップ挑戦)</button>
+      <div style="margin-bottom: 6px; background: rgba(251, 191, 36, 0.08); border: 1px solid var(--neon-gold); padding: 6px; border-radius: 4px; text-align: center;">
+        <div style="font-size: 0.6rem; font-weight: bold; color: var(--neon-gold); margin-bottom: 2px;" id="rankup-status-text">🏆 次回ランク: D級 (必要: 各45)</div>
+        <button class="sys-btn" style="width: 100%; font-size: 0.6rem; background: rgba(251, 191, 36, 0.2); border-color: var(--neon-gold); color: var(--neon-gold);" onclick="tryRankUp()">⭐ 昇格試験挑戦</button>
       </div>
 
-      <!-- 鬼畜モード切り替えスイッチ -->
       <div class="hardcore-switch-box">
         <div class="hardcore-header">
-          <span>💀 鬼畜モード（放置・未達ペナルティ）</span>
+          <span>💀 鬼畜モード（放置ペナルティ）</span>
           <label class="switch-toggle">
             <input type="checkbox" id="hardcore-toggle" onchange="toggleHardcoreMode()">
             <span class="slider"></span>
           </label>
         </div>
-        <div style="font-size: 0.65rem; color: #fca5a5; line-height: 1.4;">
-          ONにすると、未消化のタスク量や放置に応じて惰性（LZS）が蓄積し、ステータスやEXPが自動的に削られます。
+        <div style="font-size: 0.55rem; color: #fca5a5; line-height: 1.3;">
+          未消化タスクや放置で惰性（LZS）が蓄積し、ステータスやEXPが削られます。
         </div>
-        <!-- 鬼畜モード継続日数カウンター表示 -->
-        <div id="hardcore-days-display" style="font-size: 0.7rem; font-family: var(--font-mono); font-weight: bold; color: var(--neon-red); margin-top: 4px; display: none;">
-          💀 鬼畜モード継続日数：<span id="hardcore-days-val">0</span> 日目
+        <div id="hardcore-days-display" style="font-size: 0.6rem; font-family: var(--font-mono); font-weight: bold; color: var(--neon-red); margin-top: 2px; display: none;">
+          💀 鬼畜継続：<span id="hardcore-days-val">0</span> 日目
         </div>
       </div>
 
-      <div class="exp-container" style="margin-top: 12px;">
+      <div class="exp-container">
         <div class="exp-label">
           <span>LEVEL <strong id="lbl-level" style="color:var(--neon-blue);">1</strong></span>
           <span id="lbl-exp">0 / 100 EXP</span>
@@ -457,25 +480,25 @@
         </div>
       </div>
 
-      <div style="margin-top: 12px; background: rgba(15,23,42,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 8px; border-radius: 4px;">
-        <div style="font-size:0.7rem; font-weight:bold; color:var(--neon-gold);">🎯 昇格資格対応目標（自動同期）</div>
+      <div style="margin-top: 8px; background: rgba(15,23,42,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 6px; border-radius: 4px;">
+        <div style="font-size:0.6rem; font-weight:bold; color:var(--neon-gold);">🎯 目標ステータス同期</div>
         <div class="target-setting-grid">
-          <div style="text-align:center;"><div style="font-size:0.55rem; color:var(--text-dim);">STR</div><input type="text" id="input-target-str" class="sys-input" readonly></div>
-          <div style="text-align:center;"><div style="font-size:0.55rem; color:var(--text-dim);">INT</div><input type="text" id="input-target-int" class="sys-input" readonly></div>
-          <div style="text-align:center;"><div style="font-size:0.55rem; color:var(--text-dim);">AGI</div><input type="text" id="input-target-agi" class="sys-input" readonly></div>
-          <div style="text-align:center;"><div style="font-size:0.55rem; color:var(--text-dim);">SEN</div><input type="text" id="input-target-sen" class="sys-input" readonly></div>
-          <div style="text-align:center;"><div style="font-size:0.55rem; color:var(--text-dim);">VIT</div><input type="text" id="input-target-vit" class="sys-input" readonly></div>
+          <div style="text-align:center;"><div style="font-size:0.45rem; color:var(--text-dim);">STR</div><input type="text" id="input-target-str" class="sys-input" readonly></div>
+          <div style="text-align:center;"><div style="font-size:0.45rem; color:var(--text-dim);">INT</div><input type="text" id="input-target-int" class="sys-input" readonly></div>
+          <div style="text-align:center;"><div style="font-size:0.45rem; color:var(--text-dim);">AGI</div><input type="text" id="input-target-agi" class="sys-input" readonly></div>
+          <div style="text-align:center;"><div style="font-size:0.45rem; color:var(--text-dim);">SEN</div><input type="text" id="input-target-sen" class="sys-input" readonly></div>
+          <div style="text-align:center;"><div style="font-size:0.45rem; color:var(--text-dim);">VIT</div><input type="text" id="input-target-vit" class="sys-input" readonly></div>
         </div>
       </div>
 
-      <div style="margin-top: 10px;">
-        <button class="sys-btn danger" style="width:100%; font-size:0.7rem;" onclick="evaluateDailyPenalty()">⚠️ デイリー未達成ペナルティ判定</button>
+      <div style="margin-top: 8px;">
+        <button class="sys-btn danger" style="width:100%; font-size:0.6rem;" onclick="evaluateDailyPenalty()">⚠️ デイリー未達成ペナルティ判定</button>
       </div>
       
-      <div style="margin-top: 8px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
-        <button class="sys-btn" style="font-size:0.6rem; background:rgba(239,68,68,0.1); border-color:var(--neon-red); color:#fca5a5;" onclick="resetAllData()">⚠️ 初期化</button>
-        <button class="sys-btn" style="font-size:0.6rem; background:rgba(0,240,255,0.1);" onclick="exportDataJson()">📤 書出</button>
-        <button class="sys-btn" style="font-size:0.6rem; background:rgba(168,85,247,0.2); border-color:var(--neon-purple); color:#e9d5ff;" onclick="document.getElementById('import-file-input').click()">📥 読込</button>
+      <div style="margin-top: 6px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
+        <button class="sys-btn" style="font-size:0.5rem; background:rgba(239,68,68,0.1); border-color:var(--neon-red); color:#fca5a5;" onclick="resetAllData()">⚠️ 初期化</button>
+        <button class="sys-btn" style="font-size:0.5rem; background:rgba(0,240,255,0.1);" onclick="exportDataJson()">📤 書出</button>
+        <button class="sys-btn" style="font-size:0.5rem; background:rgba(168,85,247,0.2); border-color:var(--neon-purple); color:#e9d5ff;" onclick="document.getElementById('import-file-input').click()">📥 読込</button>
         <input type="file" id="import-file-input" style="display:none;" accept=".json" onchange="importDataFromJson(event)">
       </div>
     </div>
@@ -488,11 +511,12 @@
         <button class="tab-btn" onclick="switchTab('map', event)">🗺️ MAP</button>
         <button class="tab-btn" onclick="switchTab('countdown', event)">⏳ COUNT</button>
         <button class="tab-btn" onclick="switchTab('shop', event)">🛍️ SHOP</button>
+        <button class="tab-btn" onclick="switchTab('manual', event)">❓ MANUAL</button>
       </div>
 
       <!-- DAILY QUEST TAB -->
       <div id="tab-daily" class="tab-content active">
-        <div class="panel-title">⚔️ DAILY QUEST: PREPARE TO BECOME STRONGER</div>
+        <div class="panel-title">⚔️ DAILY QUEST</div>
         <div id="daily-quest-list">
           <div class="item-card" data-exp="25" data-stats='{"str":3,"vit":2}' data-penalty='{"exp":25,"stats":{"str":2}}' onclick="toggleTask(event, this)">
             <div class="item-title">🔥 パイクプッシュアップ 13回×3セット</div>
@@ -528,7 +552,7 @@
             <button class="delete-btn" onclick="deleteTask(event, this)" title="削除">✕</button>
           </div>
           <div class="item-card" data-exp="30" data-stats='{"int":3,"sen":2}' data-penalty='{"exp":30,"stats":{"int":2}}' onclick="toggleTask(event, this)">
-            <div class="item-title">📚 勉強：英単語コアイメージ・プレゼン作成 (4単語)</div>
+            <div class="item-title">📚 勉強：英単語・プレゼン作成 (4単語)</div>
             <div class="item-rewards">
               <span class="item-exp">+30 EXP</span>
               <span class="stat-badge">+3 INT</span>
@@ -542,14 +566,14 @@
 
         <div class="internal-gen-box">
           <div class="internal-gen-title">🧠 内部システム自動能力割振 (クエスト追加)</div>
-          <input type="text" id="internal-quest-input" class="sys-input" style="width:100%; margin-bottom:6px;" placeholder="タスクを入力 (例: スクワット50回)">
-          <button class="sys-btn" style="width:100%; background:rgba(0,240,255,0.2);" onclick="generateQuestInternal('daily')">自動解析してクエストを追加</button>
+          <input type="text" id="internal-quest-input" class="sys-input" style="width:100%; margin-bottom:4px;" placeholder="タスクを入力 (例: スクワット50回)">
+          <button class="sys-btn" style="width:100%; background:rgba(0,240,255,0.2); font-size:0.6rem;" onclick="generateQuestInternal('daily')">自動解析してクエストを追加</button>
         </div>
       </div>
 
       <!-- SCHEDULE TAB -->
       <div id="tab-schedule" class="tab-content">
-        <div class="panel-title">📅 TODAY'S SCHEDULE & AUTO STATS</div>
+        <div class="panel-title">📅 TODAY'S SCHEDULE</div>
         <div id="schedule-list">
           <div class="item-card" data-exp="40" data-stats='{"str":2,"agi":2,"vit":1}' onclick="toggleTask(event, this)">
             <span class="item-time">09:00</span>
@@ -576,8 +600,8 @@
 
         <div class="internal-gen-box">
           <div class="internal-gen-title">🧠 内部システム自動能力割振 (スケジュール追加)</div>
-          <input type="text" id="internal-schedule-input" class="sys-input" style="width:100%; margin-bottom:6px;" placeholder="予定を入力 (例: 14:00 図書館で自習)">
-          <button class="sys-btn" style="width:100%; background:rgba(0,240,255,0.2);" onclick="generateQuestInternal('schedule')">自動解析してスケジュールを追加</button>
+          <input type="text" id="internal-schedule-input" class="sys-input" style="width:100%; margin-bottom:4px;" placeholder="予定を入力 (例: 14:00 図書館で自習)">
+          <button class="sys-btn" style="width:100%; background:rgba(0,240,255,0.2); font-size:0.6rem;" onclick="generateQuestInternal('schedule')">自動解析してスケジュールを追加</button>
         </div>
       </div>
 
@@ -587,19 +611,19 @@
         <div id="leaflet-map"></div>
         <div class="area-grid">
           <div class="area-card-mini" id="area-card-home">
-            <div class="icon">🏠</div><div class="title">拠点 (E-RANK~)</div>
-            <button class="sys-btn" style="margin-top:5px; width:100%; font-size:0.6rem;" onclick="setBaseHere('home')">現在地登録</button>
-            <button id="checkin-btn-home" class="sys-btn" style="margin-top:3px; width:100%; font-size:0.6rem;" onclick="checkIn('home', 15)">Check-In (+15)</button>
+            <div class="icon">🏠</div><div class="title">拠点 (E~)</div>
+            <button class="sys-btn" style="margin-top:4px; width:100%; font-size:0.5rem;" onclick="setBaseHere('home')">現在地登録</button>
+            <button id="checkin-btn-home" class="sys-btn" style="margin-top:2px; width:100%; font-size:0.5rem;" onclick="checkIn('home', 15)">Check-In (+15)</button>
           </div>
           <div class="area-card-mini" id="area-card-cafe">
-            <div class="icon">☕</div><div class="title">カフェ (D-RANK~)</div>
-            <button class="sys-btn" style="margin-top:5px; width:100%; font-size:0.6rem;" onclick="setBaseHere('cafe')">現在地登録</button>
-            <button id="checkin-btn-cafe" class="sys-btn" style="margin-top:3px; width:100%; font-size:0.6rem;" onclick="checkIn('cafe', 25)">Check-In (+25)</button>
+            <div class="icon">☕</div><div class="title">カフェ (D~)</div>
+            <button class="sys-btn" style="margin-top:4px; width:100%; font-size:0.5rem;" onclick="setBaseHere('cafe')">現在地登録</button>
+            <button id="checkin-btn-cafe" class="sys-btn" style="margin-top:2px; width:100%; font-size:0.5rem;" onclick="checkIn('cafe', 25)">Check-In (+25)</button>
           </div>
           <div class="area-card-mini" id="area-card-library">
-            <div class="icon">📚</div><div class="title">図書館 (C-RANK~)</div>
-            <button class="sys-btn" style="margin-top:5px; width:100%; font-size:0.6rem;" onclick="setBaseHere('library')">現在地登録</button>
-            <button id="checkin-btn-library" class="sys-btn" style="margin-top:3px; width:100%; font-size:0.6rem;" onclick="checkIn('library', 30)">Check-In (+30)</button>
+            <div class="icon">📚</div><div class="title">図書館 (C~)</div>
+            <button class="sys-btn" style="margin-top:4px; width:100%; font-size:0.5rem;" onclick="setBaseHere('library')">現在地登録</button>
+            <button id="checkin-btn-library" class="sys-btn" style="margin-top:2px; width:100%; font-size:0.5rem;" onclick="checkIn('library', 30)">Check-In (+30)</button>
           </div>
         </div>
       </div>
@@ -609,7 +633,7 @@
         <div class="panel-title">⏳ TARGET COUNTDOWN</div>
         <div class="cd-card">
           <div class="cd-target-name" id="cd-title-display">🎯 目標：昇格試験・重要目標</div>
-          <div style="font-size:0.7rem; color:var(--text-dim);" id="cd-target-date-display">目標日時: 未設定</div>
+          <div style="font-size:0.6rem; color:var(--text-dim);" id="cd-target-date-display">目標日時: 未設定</div>
           <div class="cd-timer-grid">
             <div class="cd-time-unit"><div class="cd-val" id="cd-days">00</div><div class="cd-lbl">DAYS</div></div>
             <div class="cd-time-unit"><div class="cd-val" id="cd-hours">00</div><div class="cd-lbl">HOURS</div></div>
@@ -617,8 +641,8 @@
             <div class="cd-time-unit"><div class="cd-val" id="cd-secs">00</div><div class="cd-lbl">SECS</div></div>
           </div>
         </div>
-        <div style="background: rgba(15,23,42,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 4px;">
-          <div style="font-size:0.75rem; font-weight:bold; color:var(--neon-blue); margin-bottom:6px;">📌 新しい目標を設定</div>
+        <div style="background: rgba(15,23,42,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 6px; border-radius: 4px;">
+          <div style="font-size:0.65rem; font-weight:bold; color:var(--neon-blue); margin-bottom:4px;">📌 新しい目標を設定</div>
           <div class="cd-form">
             <input type="text" id="input-cd-title" class="sys-input" placeholder="目標名（例: 資格試験）" oninput="saveTargetCountdown()">
             <input type="datetime-local" id="input-cd-date" class="sys-input" onchange="saveTargetCountdown()">
@@ -628,38 +652,68 @@
 
       <!-- SHOP TAB -->
       <div id="tab-shop" class="tab-content">
-        <div class="panel-title">🛍️ SYSTEM BLACK MARKET (SHOP)</div>
-        <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 10px;">
-          獲得したEXPを消費して、システムから特殊アイテムや能力ブーストを購入せよ。
+        <div class="panel-title">🛍️ BLACK MARKET (SHOP)</div>
+        <div style="font-size: 0.65rem; color: var(--text-dim); margin-bottom: 6px;">
+          EXPを消費して、システムアイテムや能力ブーストを購入。
         </div>
-        <div class="stats-list" style="gap: 8px;">
+        <div class="stats-list" style="gap: 5px;">
           <div class="item-card" style="justify-content: space-between; cursor: default; flex-direction: column; align-items: stretch;">
             <div>
               <div class="item-title" style="font-weight:bold; color:var(--neon-gold);">🧪 高級体力回復ポーション</div>
-              <div style="font-size:0.65rem; color:var(--text-dim); margin-top:2px;">惰性（怠惰度）を -15 浄化します。</div>
+              <div style="font-size:0.55rem; color:var(--text-dim); margin-top:2px;">惰性（怠惰度）を -15 浄化します。</div>
             </div>
-            <button class="sys-btn" style="margin-top:6px;" onclick="buyShopItem('laziness', 15, 50)">購入 (50 EXP)</button>
+            <button class="sys-btn" style="margin-top:4px; font-size:0.6rem;" onclick="buyShopItem('laziness', 15, 50)">購入 (50 EXP)</button>
           </div>
           <div class="item-card" style="justify-content: space-between; cursor: default; flex-direction: column; align-items: stretch;">
             <div>
               <div class="item-title" style="font-weight:bold; color:var(--neon-blue);">📜 全ステータス覚醒の秘伝書</div>
-              <div style="font-size:0.65rem; color:var(--text-dim); margin-top:2px;">全ステータスが各 +1 上昇します。</div>
+              <div style="font-size:0.55rem; color:var(--text-dim); margin-top:2px;">全ステータスが各 +1 上昇します。</div>
             </div>
-            <button class="sys-btn" style="margin-top:6px;" onclick="buyShopItem('all_stats', 1, 150)">購入 (150 EXP)</button>
+            <button class="sys-btn" style="margin-top:4px; font-size:0.6rem;" onclick="buyShopItem('all_stats', 1, 150)">購入 (150 EXP)</button>
           </div>
           <div class="item-card" style="justify-content: space-between; cursor: default; flex-direction: column; align-items: stretch;">
             <div>
               <div class="item-title" style="font-weight:bold; color:var(--neon-purple);">🍀 幸運の四葉のクローバー</div>
-              <div style="font-size:0.65rem; color:var(--text-dim); margin-top:2px;">隠しLUCKステータスが +5 上昇します。</div>
+              <div style="font-size:0.55rem; color:var(--text-dim); margin-top:2px;">隠しLUCKステータスが +5 上昇します。</div>
             </div>
-            <button class="sys-btn" style="margin-top:6px;" onclick="buyShopItem('luck', 5, 100)">購入 (100 EXP)</button>
+            <button class="sys-btn" style="margin-top:4px; font-size:0.6rem;" onclick="buyShopItem('luck', 5, 100)">購入 (100 EXP)</button>
           </div>
+        </div>
+      </div>
+
+      <!-- MANUAL TAB -->
+      <div id="tab-manual" class="tab-content">
+        <div class="panel-title">❓ SYSTEM USER MANUAL</div>
+        <div class="manual-body">
+          <div class="manual-section-title">1. システム概要・コンセプト</div>
+          <div class="manual-text">『俺だけレベルアップな件』のシステム界面をモチーフにした自己成長管理アプリです。タスク、スケジュール、マップ、ポモドーロタイマー等を駆使してハンターランクを上げましょう。</div>
+
+          <div class="manual-section-title">2. ステータスと鬼畜モード</div>
+          <ul class="manual-list">
+            <li><strong>5大ステータス (STR/INT/AGI/SEN/VIT)</strong>: トレーニングや勉強で上昇します。</li>
+            <li><strong>惰性 (LZS)</strong>: 怠惰度が上がり<strong>100に達すると「死に戻り（初期化）」</strong>が発動します。</li>
+            <li><strong>💀 鬼畜モード</strong>: 未達タスクや放置に応じてペナルティが課されるハードコア設定です。</li>
+          </ul>
+
+          <div class="manual-section-title">3. ダッシュボードの機能</div>
+          <ul class="manual-list">
+            <li><strong>DAILY / SCHEDULE</strong>: タスクを完了してEXPとステータスを獲得。自動解析で予定追加も可能。</li>
+            <li><strong>MAP</strong>: 拠点や図書館などを登録し、現地でCheck-Inしてボーナス獲得。</li>
+            <li><strong>COUNT</strong>: 重要目標までの時間をリアルタイムカウントダウン。</li>
+            <li><strong>SHOP</strong>: 貯めたEXPでポーションや秘伝書を購入。</li>
+          </ul>
+
+          <div class="manual-section-title">4. 右パネルの機能</div>
+          <ul class="manual-list">
+            <li><strong>FOCUS TIMER</strong>: ポモドーロ手法で集中作業を行い、完了時にEXPとINTを獲得。</li>
+            <li><strong>GPS SATELLITE</strong>: 現在地の座標と測位精度をリアルタイムで確認。</li>
+          </ul>
         </div>
       </div>
 
       <!-- Log Terminal -->
       <div class="log-terminal" id="sys-log">
-        <div class="log-line system">[SYSTEM] レスポンシブマトリックスエンジン起動完了。</div>
+        <div class="log-line system">[SYSTEM] モバイル対応マトリックスエンジン起動完了。</div>
       </div>
     </div>
 
@@ -674,10 +728,10 @@
       </div>
       <button class="btn-timer-ctrl btn-start" id="btn-timer" onclick="toggleTimer()">ポモドーロ開始 (+15 EXP / INT+1)</button>
 
-      <hr style="border-color: rgba(0,240,255,0.2); margin: 15px 0;">
+      <hr style="border-color: rgba(0,240,255,0.2); margin: 10px 0;">
 
       <div class="panel-title">📍 GPS SATELLITE</div>
-      <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--neon-blue); line-height: 1.6;">
+      <div style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--neon-blue); line-height: 1.4;">
         <div>LAT: <span id="gps-lat" style="color: #fff;">未取得</span></div>
         <div>LNG: <span id="gps-lng" style="color: #fff;">未取得</span></div>
         <div>精度: <span id="gps-acc" style="color: #fff;">--</span> m</div>
@@ -696,7 +750,7 @@
       ☠️ 惰性の代償として、未達成クエスト1個につき惰性が **+10** 浸食しました。<br>
       ☠️ システムへの忠誠を取り戻せ。
     </div>
-    <button class="sys-btn danger" style="width:100%; padding:10px; font-size:0.9rem;" onclick="closePenaltyModal()">試練を受け入れる (完了)</button>
+    <button class="sys-btn danger" style="width:100%; padding:8px; font-size:0.75rem;" onclick="closePenaltyModal()">試練を受け入れる (完了)</button>
   </div>
 </div>
 
@@ -715,10 +769,10 @@
 <div class="survey-overlay" id="survey-modal" style="display:flex;">
   <div class="survey-card">
     <div class="panel-title" style="color: var(--neon-blue);">🧬 プレイヤー覚醒診断</div>
-    <div style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 8px;">ハンター名と、学歴・資格・生活習慣の項目を選択してください。</div>
+    <div style="font-size: 0.6rem; color: var(--text-dim); margin-bottom: 5px;">ハンター名と、学歴・資格・生活習慣の項目を選択してください。</div>
     
-    <div style="margin-bottom: 10px; background: rgba(0,240,255,0.05); border: 1px solid var(--neon-blue); padding: 8px; border-radius: 4px;">
-      <div style="font-size: 0.75rem; font-weight: bold; color: var(--neon-blue); margin-bottom: 4px;">👤 ハンター名設定</div>
+    <div style="margin-bottom: 6px; background: rgba(0,240,255,0.05); border: 1px solid var(--neon-blue); padding: 6px; border-radius: 4px;">
+      <div style="font-size: 0.65rem; font-weight: bold; color: var(--neon-blue); margin-bottom: 2px;">👤 ハンター名設定</div>
       <input type="text" id="survey-input-name" class="sys-input" style="width:100%;" value="水篠 旬">
     </div>
 
@@ -761,7 +815,7 @@
       </div>
     </div>
 
-    <button class="sys-btn" style="width:100%; padding:10px; font-size:0.85rem; background: var(--neon-blue); color:#000;" onclick="submitCharacterSurvey()">覚醒を完了する (ゲーム開始)</button>
+    <button class="sys-btn" style="width:100%; padding:8px; font-size:0.75rem; background: var(--neon-blue); color:#000;" onclick="submitCharacterSurvey()">覚醒を完了する (ゲーム開始)</button>
   </div>
 </div>
 
@@ -1089,7 +1143,7 @@
         </div>
         <div>
           ${isUnlocked ? `
-            <button class="sys-btn" style="font-size:0.65rem; padding:4px 8px;" onclick="equipTitle('${ach.id}')" ${isEquipped ? 'disabled' : ''}>
+            <button class="sys-btn" style="font-size:0.6rem; padding:3px 6px;" onclick="equipTitle('${ach.id}')" ${isEquipped ? 'disabled' : ''}>
               ${isEquipped ? '装着中' : '装着'}
             </button>
           ` : ''}
@@ -1402,8 +1456,8 @@
         const customIcon = L.divIcon({
           className: 'botw-pin',
           html: loc.icon,
-          iconSize: [28, 28],
-          iconAnchor: [14, 14]
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
         });
         const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(map);
         marker.bindPopup(`<b>${loc.name}</b>`);
@@ -1542,42 +1596,67 @@
 
     document.getElementById('player-name-display').innerText = playerState.name;
     document.getElementById('player-title-display').innerText = currentTitleObj.name;
-    document.getElementById('rank-display').innerText = playerState.rank || "E-RANK";
+    document.getElementById('rank-display').innerText = playerState.rank;
+    
     document.getElementById('lbl-level').innerText = playerState.level;
     document.getElementById('lbl-exp').innerText = `${playerState.exp} / ${playerState.maxExp} EXP`;
-    document.getElementById('bar-exp-fill').style.width = `${Math.min(100, (playerState.exp / playerState.maxExp) * 100)}%`;
+    const expPercent = Math.min(100, Math.max(0, (playerState.exp / playerState.maxExp) * 100));
+    document.getElementById('bar-exp-fill').style.width = `${expPercent}%`;
+
+    document.getElementById('val-str').innerText = playerState.stats.str;
+    document.getElementById('val-int').innerText = playerState.stats.int;
+    document.getElementById('val-agi').innerText = playerState.stats.agi;
+    document.getElementById('val-sen').innerText = playerState.stats.sen;
+    document.getElementById('val-vit').innerText = playerState.stats.vit;
+    document.getElementById('val-laziness').innerText = playerState.laziness || 0;
 
     const req = getCurrentRankRequirement();
-    ['str', 'int', 'agi', 'sen', 'vit'].forEach(k => {
-      document.getElementById(`target-${k}`).innerText = `/ ${req.minStat}`;
-      const targetInput = document.getElementById(`input-target-${k}`);
-      if (targetInput) targetInput.value = req.minStat;
-    });
+    if (req.rank !== "NATIONAL-RANK") {
+      document.getElementById('rankup-status-text').innerText = `🏆 次回ランク: ${req.nextRank} (必要Lvl:${req.minLevel} / 各:${req.minStat})`;
+      ['str', 'int', 'agi', 'sen', 'vit'].forEach(st => {
+        document.getElementById(`target-${st}`).innerText = `/ ${req.minStat}`;
+        document.getElementById(`input-target-${st}`).value = req.minStat;
+      });
+    } else {
+      document.getElementById('rankup-status-text').innerText = `🏆 最高峰ナショナル級到達済`;
+    }
 
-    const buffs = currentTitleObj.buff || {};
-    ['str', 'int', 'agi', 'vit', 'sen'].forEach(k => {
-      const baseVal = playerState.stats[k];
-      const buffVal = buffs[k] || 0;
-      document.getElementById(`val-${k}`).innerText = baseVal + buffVal;
-      document.getElementById(`buff-${k}`).innerText = buffVal > 0 ? `(+${buffVal})` : '';
-    });
+    if (currentTitleObj.buff) {
+      Object.keys(playerState.stats).forEach(st => {
+        const buffEl = document.getElementById(`buff-${st}`);
+        if (currentTitleObj.buff[st]) {
+          buffEl.innerText = `(+${currentTitleObj.buff[st]})`;
+        } else {
+          buffEl.innerText = '';
+        }
+      });
+    }
 
-    const lzsEl = document.getElementById('val-laziness');
-    if (lzsEl) lzsEl.innerText = playerState.laziness !== undefined ? playerState.laziness : 10;
-
-    updateHardcoreUI();
     checkLazinessDeath();
   }
 
-  window.onload = () => {
-    const isLoaded = loadGame();
-    if (!isLoaded || !playerState.isInitialized) {
-      document.getElementById('survey-modal').style.display = 'flex';
-    }
+  window.onload = function() {
+    const loaded = loadGame();
     initBotwMap();
+    if (!loaded || !playerState.isInitialized) {
+      document.getElementById('survey-modal').style.display = 'flex';
+    } else {
+      updateUI();
+    }
     setInterval(updateCountdownDisplay, 1000);
-    updateUI();
-    saveGame();
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition((pos) => {
+        const latEl = document.getElementById('gps-lat');
+        const lngEl = document.getElementById('gps-lng');
+        const accEl = document.getElementById('gps-acc');
+        if (latEl && lngEl && accEl) {
+          latEl.innerText = pos.coords.latitude.toFixed(4);
+          lngEl.innerText = pos.coords.longitude.toFixed(4);
+          accEl.innerText = Math.round(pos.coords.accuracy);
+        }
+      }, (err) => {}, { enableHighAccuracy: true });
+    }
   };
 </script>
 </body>
