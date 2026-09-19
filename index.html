@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SYSTEM INTERFACE - SOLO LEVELING EDITION</title>
+<!-- Leaflet.js (Map Library) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+  :root {
+    --bg-color: #030712;
+    --panel-bg: rgba(10, 16, 31, 0.9);
+    --panel-border: #1e3a8a;
+    --neon-blue: #00f0ff;
+    --neon-glow: rgba(0, 240, 255, 0.4);
+    --neon-purple: #a855f7;
+    --neon-gold: #fbbf24;
+    --neon-green: #10b981;
+    --neon-red: #ef4444;
+    --text-primary: #f3f4f6;
+    --text-dim: #9ca3af;
+    --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    padding: 10px;
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.8) 0%, rgba(3, 7, 18, 1) 100%),
+      linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 20px 20px, 20px 20px;
+  }
+
+  .container { max-width: 1450px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+
+  header {
+    background: var(--panel-bg);
+    border: 1px solid var(--neon-blue);
+    box-shadow: 0 0 10px var(--neon-glow);
+    padding: 12px 15px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  @media (min-width: 768px) {
+    header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 25px;
+    }
+  }
+
+  .system-title { font-size: 1rem; font-weight: 900; letter-spacing: 2px; color: var(--neon-blue); word-break: break-all; }
+  @media (min-width: 768px) { .system-title { font-size: 1.2rem; letter-spacing: 3px; } }
+
+  .system-status { font-family: var(--font-mono); font-size: 0.75rem; color: var(--neon-green); display: flex; align-items: center; gap: 6px; }
+
+  /* 3カラムからレスポンシブへ完全移行 */
+  .grid-main { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 1024px) { 
+    .grid-main { grid-template-columns: 320px 1fr 320px; gap: 20px; } 
+  }
+
+  .panel {
+    background: var(--panel-bg); border: 1px solid var(--panel-border);
+    border-radius: 4px; padding: 12px; position: relative; backdrop-filter: blur(8px);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+  @media (min-width: 768px) { .panel { padding: 20px; } }
+
+  .panel-title {
+    font-size: 0.9rem; font-weight: 700; color: var(--neon-blue); letter-spacing: 1px;
+    border-bottom: 1px solid rgba(0, 240, 255, 0.2); padding-bottom: 8px; margin-bottom: 12px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px;
+  }
+  @media (min-width: 768px) { .panel-title { font-size: 1rem; letter-spacing: 2px; padding-bottom: 10px; margin-bottom: 15px; } }
+
+  /* Status UI */
+  .player-card { text-align: center; margin-bottom: 12px; }
+  .avatar-frame { width: 60px; height: 60px; margin: 0 auto 6px; border: 2px solid var(--neon-blue); border-radius: 50%; padding: 2px; box-shadow: 0 0 10px var(--neon-glow); }
+  @media (min-width: 768px) { .avatar-frame { width: 70px; height: 70px; margin-bottom: 8px; } }
+  .avatar-inner { width: 100%; height: 100%; background: #0f172a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+  
+  .player-name-box { display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: bold; font-size: 1rem; flex-wrap: wrap; }
+  .player-title-box { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.75rem; color: var(--neon-purple); margin-top: 4px; font-weight: bold; flex-wrap: wrap; }
+  
+  .edit-btn { background: none; border: 1px solid var(--neon-blue); color: var(--neon-blue); border-radius: 3px; padding: 2px 6px; font-size: 0.65rem; cursor: pointer; }
+  .edit-btn:hover { background: var(--neon-blue); color: #000; }
+
+  .exp-container { margin: 12px 0; }
+  .exp-label { display: flex; justify-content: space-between; font-size: 0.75rem; font-family: var(--font-mono); color: var(--text-dim); margin-bottom: 4px; }
+  .bar-bg { height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.3); }
+  @media (min-width: 768px) { .bar-bg { height: 10px; } }
+  .bar-fill { height: 100%; background: linear-gradient(90deg, #00f0ff, #a855f7); width: 0%; box-shadow: 0 0 10px var(--neon-blue); transition: width 0.5s ease; }
+
+  .stats-list { display: flex; flex-direction: column; gap: 6px; }
+  @media (min-width: 768px) { .stats-list { gap: 8px; } }
+  .stat-item { display: grid; grid-template-columns: 35px 1fr 1.2fr; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 6px 10px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.05); }
+  @media (min-width: 768px) { .stat-item { grid-template-columns: 40px 1fr 1fr; padding: 8px 12px; } }
+  .stat-code { font-weight: bold; color: var(--neon-blue); font-family: var(--font-mono); font-size: 0.85rem; }
+  .stat-name { font-size: 0.7rem; color: var(--text-dim); }
+  @media (min-width: 768px) { .stat-name { font-size: 0.75rem; } }
+  .stat-val-group { display: flex; align-items: center; justify-content: flex-end; gap: 3px; font-family: var(--font-mono); font-size: 0.75rem; }
+  @media (min-width: 768px) { .stat-val-group { font-size: 0.85rem; gap: 4px; } }
+  .stat-val { font-size: 0.85rem; font-weight: 800; }
+  @media (min-width: 768px) { .stat-val { font-size: 0.95rem; } }
+  .stat-buff { font-size: 0.65rem; color: var(--neon-green); font-weight: bold; }
+  .stat-target { font-size: 0.7rem; color: var(--neon-gold); }
+  @media (min-width: 768px) { .stat-target { font-size: 0.8rem; } }
+
+  /* Tabs UI */
+  .tab-buttons { display: flex; gap: 4px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+  .tab-btn { flex: 1; min-width: 65px; padding: 7px 4px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--panel-border); color: var(--text-dim); font-size: 0.65rem; font-weight: bold; cursor: pointer; border-radius: 3px; white-space: nowrap; text-align: center; }
+  @media (min-width: 768px) { .tab-btn { font-size: 0.7rem; padding: 8px; min-width: 70px; } }
+  .tab-btn.active { background: var(--neon-blue); color: #000; box-shadow: 0 0 10px var(--neon-glow); border-color: var(--neon-blue); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Task Item UI */
+  .item-card { display: flex; align-items: flex-start; gap: 8px; background: rgba(15, 23, 42, 0.4); padding: 8px 10px; margin-bottom: 8px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; }
+  @media (min-width: 768px) { 
+    .item-card { align-items: center; padding: 10px; gap: 10px; } 
+  }
+  .item-card.completed { border-color: rgba(0, 240, 255, 0.3); background: rgba(0, 240, 255, 0.05); }
+  .item-card.completed .item-title { text-decoration: line-through; color: var(--text-dim); }
+  .item-time { font-family: var(--font-mono); font-size: 0.75rem; color: var(--neon-gold); font-weight: bold; min-width: 45px; }
+  @media (min-width: 768px) { .item-time { font-size: 0.8rem; min-width: 50px; } }
+  .item-title { font-size: 0.8rem; flex-grow: 1; word-break: break-all; }
+  @media (min-width: 768px) { .item-title { font-size: 0.85rem; } }
+  .item-rewards { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; width: 100%; margin-top: 4px; }
+  @media (min-width: 768px) { .item-rewards { width: auto; margin-top: 0; gap: 6px; } }
+  .item-exp { font-family: var(--font-mono); font-size: 0.7rem; color: var(--neon-purple); font-weight: bold; }
+  .stat-badge { font-family: var(--font-mono); font-size: 0.65rem; background: rgba(168, 85, 247, 0.2); border: 1px solid var(--neon-purple); color: #e9d5ff; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
+  .penalty-badge { font-family: var(--font-mono); font-size: 0.65rem; background: rgba(239, 68, 68, 0.2); border: 1px solid var(--neon-red); color: #fca5a5; padding: 1px 4px; border-radius: 3px; font-weight: bold; }
+  .checkbox { width: 20px; height: 20px; border: 2px solid var(--neon-blue); border-radius: 3px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  @media (min-width: 768px) { .checkbox { width: 18px; height: 18px; margin-top: 0; } }
+  .item-card.completed .checkbox::after { content: '✓'; color: var(--neon-blue); font-weight: bold; font-size: 0.8rem; }
+  
+  .delete-btn {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid var(--neon-red);
+    color: var(--neon-red);
+    font-size: 0.75rem;
+    font-weight: bold;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .delete-btn:hover {
+    background: var(--neon-red);
+    color: #fff;
+    box-shadow: 0 0 8px var(--neon-red);
+  }
+
+  /* Map View */
+  #leaflet-map { width: 100%; height: 220px; border-radius: 6px; border: 2px solid var(--neon-blue); box-shadow: 0 0 10px var(--neon-glow); margin-bottom: 12px; background: #000; }
+  @media (min-width: 768px) { #leaflet-map { height: 280px; margin-bottom: 15px; } }
+  .botw-pin { background: rgba(10, 16, 31, 0.9); border: 2px solid var(--neon-blue); border-radius: 50%; text-align: center; line-height: 28px; font-size: 1rem; box-shadow: 0 0 10px var(--neon-blue); }
+
+  /* Countdown UI */
+  .cd-card { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--panel-border); border-radius: 6px; padding: 12px; margin-bottom: 12px; text-align: center; }
+  .cd-target-name { font-size: 0.95rem; font-weight: bold; color: var(--neon-gold); margin-bottom: 4px; word-break: break-all; }
+  @media (min-width: 768px) { .cd-target-name { font-size: 1.1rem; } }
+  .cd-timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0; }
+  @media (min-width: 768px) { .cd-timer-grid { gap: 8px; margin: 12px 0; } }
+  .cd-time-unit { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 4px; padding: 6px 2px; }
+  @media (min-width: 768px) { .cd-time-unit { padding: 8px; } }
+  .cd-val { font-family: var(--font-mono); font-size: 1.1rem; font-weight: bold; color: var(--neon-blue); }
+  @media (min-width: 768px) { .cd-val { font-size: 1.5rem; } }
+  .cd-lbl { font-size: 0.55rem; color: var(--text-dim); }
+  @media (min-width: 768px) { .cd-lbl { font-size: 0.65rem; } }
+
+  /* Forms & Inputs */
+  .cd-form { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .sys-input { background: #000; border: 1px solid var(--panel-border); color: #fff; padding: 8px; border-radius: 3px; font-family: var(--font-mono); font-size: 0.8rem; width: 100%; }
+  .sys-btn { padding: 8px; background: rgba(0, 240, 255, 0.2); border: 1px solid var(--neon-blue); color: var(--neon-blue); font-weight: bold; cursor: pointer; border-radius: 3px; font-size: 0.75rem; text-align: center; }
+  @media (min-width: 768px) { .sys-btn { font-size: 0.8rem; } }
+  .sys-btn:hover { background: var(--neon-blue); color: #000; }
+  .sys-btn.danger { background: rgba(239, 68, 68, 0.2); border-color: var(--neon-red); color: var(--neon-red); }
+  .sys-btn.danger:hover { background: var(--neon-red); color: #000; }
+  .sys-btn:disabled, .sys-btn.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+  .area-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  @media (min-width: 480px) { .area-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; } }
+  .area-card-mini { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--panel-border); border-radius: 4px; padding: 8px; text-align: center; }
+  .area-card-mini .icon { font-size: 1.3rem; margin-bottom: 2px; }
+  .area-card-mini .title { font-size: 0.7rem; font-weight: bold; color: var(--neon-blue); }
+
+  /* Timer UI */
+  .timer-display { font-family: var(--font-mono); font-size: 2.2rem; font-weight: 900; text-align: center; color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-glow); margin: 8px 0; }
+  @media (min-width: 768px) { .timer-display { font-size: 2.8rem; text-shadow: 0 0 15px var(--neon-glow); margin: 10px 0; } }
+  .timer-preset { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; }
+  .btn-preset { padding: 4px 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--neon-purple); color: var(--neon-purple); border-radius: 3px; font-size: 0.7rem; font-family: var(--font-mono); cursor: pointer; }
+  .btn-timer-ctrl { width: 100%; padding: 8px; font-weight: bold; border-radius: 3px; border: none; cursor: pointer; font-size: 0.8rem; }
+  @media (min-width: 768px) { .btn-timer-ctrl { font-size: 0.85rem; } }
+  .btn-start { background: var(--neon-blue); color: #000; box-shadow: 0 0 10px var(--neon-glow); }
+  .btn-stop { background: var(--neon-red); color: #fff; }
+
+  /* Log Terminal */
+  .log-terminal { background: #000; border: 1px solid rgba(0, 240, 255, 0.3); font-family: var(--font-mono); font-size: 0.7rem; padding: 8px; height: 90px; overflow-y: auto; color: var(--neon-green); border-radius: 4px; margin-top: 12px; }
+  @media (min-width: 768px) { .log-terminal { font-size: 0.75rem; height: 100px; padding: 10px; margin-top: 15px; } }
+  .log-line { margin-bottom: 3px; word-break: break-all; }
+  .log-line.system { color: var(--neon-blue); }
+  .log-line.warn { color: var(--neon-gold); }
+  .log-line.danger { color: var(--neon-red); }
+
+  .target-setting-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin-top: 6px; }
+  .target-setting-grid input { width: 100%; padding: 3px 2px; text-align: center; font-size: 0.65rem; background: rgba(0,0,0,0.8); color: var(--neon-gold); border: 1px solid var(--panel-border); font-family: var(--font-mono); border-radius: 2px; }
+
+  /* Internal Auto Generator Box */
+  .internal-gen-box { margin-top: 12px; background: rgba(0,240,255,0.03); padding: 10px; border: 1px solid rgba(0,240,255,0.3); border-radius: 4px; }
+  .internal-gen-title { font-size: 0.75rem; color: var(--neon-blue); font-weight: bold; margin-bottom: 5px; }
+
+  /* 鬼畜モード切り替えスイッチエリア */
+  .hardcore-switch-box {
+    margin-top: 10px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid var(--neon-red);
+    padding: 8px 10px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .hardcore-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: var(--neon-red);
+  }
+  .switch-toggle {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .switch-toggle input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #334155; transition: .3s; border-radius: 20px;
+    border: 1px solid #475569;
+  }
+  .slider:before {
+    position: absolute; content: ""; height: 14px; width: 14px; left: 2px; bottom: 2px;
+    background-color: white; transition: .3s; border-radius: 50%;
+  }
+  input:checked + .slider { background-color: var(--neon-red); border-color: var(--neon-red); }
+  input:checked + .slider:before { transform: translateX(20px); }
+
+  /* 🚨 ペナルティモーダル UI 🚨 */
+  .penalty-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(15, 0, 0, 0.92); z-index: 9999; flex-direction: column;
+    align-items: center; justify-content: center; backdrop-filter: blur(10px); padding: 15px;
+    animation: flash-red 1s infinite alternate;
+  }
+  @keyframes flash-red {
+    0% { box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.4); }
+    100% { box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.8); }
+  }
+  .penalty-card {
+    background: #000; border: 2px solid var(--neon-red); box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+    width: 100%; max-width: 480px; padding: 20px; border-radius: 8px; text-align: center; font-family: var(--font-mono);
+  }
+  .penalty-title { color: var(--neon-red); font-size: 1.2rem; font-weight: 900; letter-spacing: 3px; margin-bottom: 8px; text-shadow: 0 0 8px var(--neon-red); }
+  @media (min-width: 768px) { .penalty-title { font-size: 1.5rem; letter-spacing: 4px; } }
+  .penalty-sub { font-size: 0.75rem; color: #fca5a5; margin-bottom: 15px; line-height: 1.4; }
+  @media (min-width: 768px) { .penalty-sub { font-size: 0.85rem; margin-bottom: 20px; } }
+  .penalty-quest-box { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--neon-red); padding: 12px; border-radius: 4px; text-align: left; margin-bottom: 15px; color: #fff; font-size: 0.75rem; line-height: 1.6; }
+  @media (min-width: 768px) { .penalty-quest-box { padding: 15px; font-size: 0.85rem; line-height: 1.8; margin-bottom: 20px; } }
+
+  /* 🏆 称号＆実績モーダル UI */
+  .modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85); z-index: 9998; justify-content: center; align-items: center; backdrop-filter: blur(5px); padding: 10px;
+  }
+  .modal-card {
+    background: var(--panel-bg); border: 2px solid var(--neon-purple); box-shadow: 0 0 20px var(--neon-purple);
+    width: 100%; max-width: 550px; padding: 15px; border-radius: 6px; max-height: 85vh; display: flex; flex-direction: column;
+  }
+  @media (min-width: 768px) { .modal-card { padding: 20px; } }
+  .modal-header { font-size: 1rem; font-weight: 900; color: var(--neon-purple); letter-spacing: 1px; margin-bottom: 12px; border-bottom: 1px solid rgba(168, 85, 247, 0.3); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; gap: 5px; }
+  @media (min-width: 768px) { .modal-header { font-size: 1.2rem; letter-spacing: 2px; margin-bottom: 15px; padding-bottom: 8px; } }
+  .title-list { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
+  .title-item { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 4px; display: flex; flex-direction: column; gap: 8px; }
+  @media (min-width: 480px) { .title-item { flex-direction: row; justify-content: space-between; align-items: center; } }
+  .title-item.unlocked { border-color: var(--neon-purple); }
+  .title-item.equipped { border-color: var(--neon-gold); background: rgba(251, 191, 36, 0.08); }
+  .title-info { display: flex; flex-direction: column; gap: 3px; }
+  .title-name-text { font-weight: bold; font-size: 0.85rem; color: #fff; }
+  @media (min-width: 768px) { .title-name-text { font-size: 0.95rem; } }
+  .title-desc { font-size: 0.7rem; color: var(--text-dim); }
+  .title-buff { font-size: 0.7rem; color: var(--neon-green); font-family: var(--font-mono); font-weight: bold; }
+  .title-lock-tag { font-size: 0.65rem; color: var(--neon-red); font-family: var(--font-mono); }
+
+  /* 📝 キャラクリエイト診断モーダル */
+  .survey-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(3, 7, 18, 0.95); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(8px); padding: 10px;
+  }
+  .survey-card {
+    background: var(--panel-bg); border: 2px solid var(--neon-blue); box-shadow: 0 0 25px var(--neon-glow);
+    width: 100%; max-width: 720px; padding: 15px; border-radius: 6px; max-height: 92vh; display: flex; flex-direction: column; font-family: var(--font-sans);
+  }
+  @media (min-width: 768px) { .survey-card { padding: 25px; } }
+  .survey-body { overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 4px; margin: 10px 0; }
+  @media (min-width: 768px) { .survey-body { gap: 15px; margin: 15px 0; } }
+  .survey-section { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--panel-border); padding: 10px; border-radius: 4px; }
+  @media (min-width: 768px) { .survey-section { padding: 12px; } }
+  .survey-section-title { font-size: 0.8rem; font-weight: bold; color: var(--neon-blue); margin-bottom: 6px; }
+  @media (min-width: 768px) { .survey-section-title { font-size: 0.9rem; margin-bottom: 8px; } }
+  .survey-option-label { display: flex; align-items: flex-start; gap: 6px; font-size: 0.75rem; margin-bottom: 6px; cursor: pointer; color: var(--text-primary); line-height: 1.4; }
+  @media (min-width: 768px) { .survey-option-label { align-items: center; font-size: 0.8rem; gap: 8px; } }
+  .survey-option-label input { accent-color: var(--neon-blue); width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; margin-top: 1px; }
+  @media (min-width: 768px) { .survey-option-label input { margin-top: 0; } }
+  
+  .autosave-indicator {
+    font-size: 0.7rem;
+    color: var(--neon-green);
+    font-family: var(--font-mono);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="system-title">⚔️ SOLO SYSTEM (SOLO LEVELING EDITION)</div>
+    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+      <div id="autosave-status" class="autosave-indicator">💾 自動保存: 待機中</div>
+      <div class="system-status"><span style="width:8px;height:8px;background:var(--neon-green);border-radius:50%;display:inline-block;"></span> SYSTEM ACTIVE</div>
+    </div>
+  </header>
+
+  <div class="grid-main">
+    <!-- LEFT PANEL: Player Status -->
+    <div class="panel">
+      <div class="panel-title">
+        <span>◈ HUNTER STATUS</span>
+        <span id="rank-display" style="font-size:0.75rem; font-family:var(--font-mono); color:var(--neon-gold);">E-RANK</span>
+      </div>
+
+      <div class="player-card">
+        <div class="avatar-frame"><div class="avatar-inner">🗡️</div></div>
+        <div class="player-name-box">
+          <span id="player-name-display">水篠 旬</span>
+          <button class="edit-btn" onclick="editPlayerName()">✏️ 名前変更</button>
+        </div>
+        <div class="player-title-box">
+          【<span id="player-title-display">見習い探求者</span>】
+          <button class="edit-btn" onclick="openTitleModal()">🏷️ 称号・実績</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 10px; background: rgba(251, 191, 36, 0.08); border: 1px solid var(--neon-gold); padding: 8px; border-radius: 4px; text-align: center;">
+        <div style="font-size: 0.7rem; font-weight: bold; color: var(--neon-gold); margin-bottom: 4px;" id="rankup-status-text">🏆 次回ランク: D級 (必要ステータス: 各45)</div>
+        <button class="sys-btn" style="width: 100%; font-size: 0.7rem; background: rgba(251, 191, 36, 0.2); border-color: var(--neon-gold); color: var(--neon-gold);" onclick="tryRankUp()">⭐ 昇格試験 (ランクアップ挑戦)</button>
+      </div>
+
+      <!-- 鬼畜モード切り替えスイッチ -->
+      <div class="hardcore-switch-box">
+        <div class="hardcore-header">
+          <span>💀 鬼畜モード（放置・未達ペナルティ）</span>
+          <label class="switch-toggle">
+            <input type="checkbox" id="hardcore-toggle" onchange="toggleHardcoreMode()">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div style="font-size: 0.65rem; color: #fca5a5; line-height: 1.4;">
+          ONにすると、未消化のタスク量や放置に応じて惰性（LZS）が蓄積し、ステータスやEXPが自動的に削られます。
+        </div>
+        <!-- 鬼畜モード継続日数カウンター表示 -->
+        <div id="hardcore-days-display" style="font-size: 0.7rem; font-family: var(--font-mono); font-weight: bold; color: var(--neon-red); margin-top: 4px; display: none;">
+          💀 鬼畜モード継続日数：<span id="hardcore-days-val">0</span> 日目
+        </div>
+      </div>
+
+      <div class="exp-container" style="margin-top: 12px;">
+        <div class="exp-label">
+          <span>LEVEL <strong id="lbl-level" style="color:var(--neon-blue);">1</strong></span>
+          <span id="lbl-exp">0 / 100 EXP</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" id="bar-exp-fill"></div></div>
+      </div>
+
+      <div class="stats-list">
+        <div class="stat-item">
+          <span class="stat-code">STR</span><span class="stat-name">筋力</span>
+          <div class="stat-val-group">
+            <span class="stat-val" id="val-str">10</span>
+            <span class="stat-buff" id="buff-str"></span>
+            <span class="stat-target" id="target-str">/ 45</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-code">INT</span><span class="stat-name">知力</span>
+          <div class="stat-val-group">
+            <span class="stat-val" id="val-int">10</span>
+            <span class="stat-buff" id="buff-int"></span>
+            <span class="stat-target" id="target-int">/ 45</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-code">AGI</span><span class="stat-name">敏捷</span>
+          <div class="stat-val-group">
+            <span class="stat-val" id="val-agi">10</span>
+            <span class="stat-buff" id="buff-agi"></span>
+            <span class="stat-target" id="target-agi">/ 45</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-code">SEN</span><span class="stat-name">感覚</span>
+          <div class="stat-val-group">
+            <span class="stat-val" id="val-sen">10</span>
+            <span class="stat-buff" id="buff-sen"></span>
+            <span class="stat-target" id="target-sen">/ 45</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-code">VIT</span><span class="stat-name">体力</span>
+          <div class="stat-val-group">
+            <span class="stat-val" id="val-vit">10</span>
+            <span class="stat-buff" id="buff-vit"></span>
+            <span class="stat-target" id="target-vit">/ 45</span>
+          </div>
+        </div>
+        <div class="stat-item" style="border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05);">
+          <span class="stat-code" style="color:var(--neon-red);">LZS</span><span class="stat-name">惰性 (怠惰度)</span>
+          <div class="stat-val-group">
+            <span class="stat-val" id="val-laziness" style="color:var(--neon-red);">10</span>
+            <span class="stat-target" id="target-laziness" style="color:var(--text-dim);">max 100</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 12px; background: rgba(15,23,42,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 8px; border-radius: 4px;">
+        <div style="font-size:0.7rem; font-weight:bold; color:var(--neon-gold);">🎯 昇格資格対応目標（自動同期）</div>
+        <div class="target-setting-grid">
+          <div style="text-align:center;"><div style="font-size:0.55rem; color:var(--text-dim);">STR</div><input type="text" id="input-target-str" class="sys-input" readonly></div>
+          <div style="text-align:center;"><div style="font-size:0.55rem; color:var(--text-dim);">INT</div><input type="text" id="input-target-int" class="sys-input" readonly></div>
+          <div style="text-align:center;"><div style="font-size:0.55rem; color:var(--text-dim);">AGI</div><input type="text" id="input-target-agi" class="sys-input" readonly></div>
+          <div style="text-align:center;"><div style="font-size:0.55rem; color:var(--text-dim);">SEN</div><input type="text" id="input-target-sen" class="sys-input" readonly></div>
+          <div style="text-align:center;"><div style="font-size:0.55rem; color:var(--text-dim);">VIT</div><input type="text" id="input-target-vit" class="sys-input" readonly></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <button class="sys-btn danger" style="width:100%; font-size:0.7rem;" onclick="evaluateDailyPenalty()">⚠️ デイリー未達成ペナルティ判定</button>
+      </div>
+      
+      <div style="margin-top: 8px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
+        <button class="sys-btn" style="font-size:0.6rem; background:rgba(239,68,68,0.1); border-color:var(--neon-red); color:#fca5a5;" onclick="resetAllData()">⚠️ 初期化</button>
+        <button class="sys-btn" style="font-size:0.6rem; background:rgba(0,240,255,0.1);" onclick="exportDataJson()">📤 書出</button>
+        <button class="sys-btn" style="font-size:0.6rem; background:rgba(168,85,247,0.2); border-color:var(--neon-purple); color:#e9d5ff;" onclick="document.getElementById('import-file-input').click()">📥 読込</button>
+        <input type="file" id="import-file-input" style="display:none;" accept=".json" onchange="importDataFromJson(event)">
+      </div>
+    </div>
+
+    <!-- CENTER PANEL: Dashboard -->
+    <div class="panel">
+      <div class="tab-buttons">
+        <button class="tab-btn active" onclick="switchTab('daily', event)">⚔️ DAILY</button>
+        <button class="tab-btn" onclick="switchTab('schedule', event)">SCHEDULE</button>
+        <button class="tab-btn" onclick="switchTab('map', event)">🗺️ MAP</button>
+        <button class="tab-btn" onclick="switchTab('countdown', event)">⏳ COUNT</button>
+        <button class="tab-btn" onclick="switchTab('shop', event)">🛍️ SHOP</button>
+      </div>
+
+      <!-- DAILY QUEST TAB -->
+      <div id="tab-daily" class="tab-content active">
+        <div class="panel-title">⚔️ DAILY QUEST: PREPARE TO BECOME STRONGER</div>
+        <div id="daily-quest-list">
+          <div class="item-card" data-exp="25" data-stats='{"str":3,"vit":2}' data-penalty='{"exp":25,"stats":{"str":2}}' onclick="toggleTask(event, this)">
+            <div class="item-title">🔥 パイクプッシュアップ 13回×3セット</div>
+            <div class="item-rewards">
+              <span class="item-exp">+25 EXP</span>
+              <span class="stat-badge">+3 STR</span>
+              <span class="stat-badge">+2 VIT</span>
+              <span class="penalty-badge">未達成: -25 EXP / -2 STR</span>
+            </div>
+            <div class="checkbox"></div>
+            <button class="delete-btn" onclick="deleteTask(event, this)" title="削除">✕</button>
+          </div>
+          <div class="item-card" data-exp="25" data-stats='{"str":3,"agi":2}' data-penalty='{"exp":25,"stats":{"str":2}}' onclick="toggleTask(event, this)">
+            <div class="item-title">⚡ ディップス 10回×3セット</div>
+            <div class="item-rewards">
+              <span class="item-exp">+25 EXP</span>
+              <span class="stat-badge">+3 STR</span>
+              <span class="stat-badge">+2 AGI</span>
+              <span class="penalty-badge">未達成: -25 EXP / -2 STR</span>
+            </div>
+            <div class="checkbox"></div>
+            <button class="delete-btn" onclick="deleteTask(event, this)" title="削除">✕</button>
+          </div>
+          <div class="item-card" data-exp="20" data-stats='{"vit":3,"sen":1}' data-penalty='{"exp":20,"stats":{"vit":2}}' onclick="toggleTask(event, this)">
+            <div class="item-title">🧊 ドローイング 30秒×3セット</div>
+            <div class="item-rewards">
+              <span class="item-exp">+20 EXP</span>
+              <span class="stat-badge">+3 VIT</span>
+              <span class="stat-badge">+1 SEN</span>
+              <span class="penalty-badge">未達成: -20 EXP / -2 VIT</span>
+            </div>
+            <div class="checkbox"></div>
+            <button class="delete-btn" onclick="deleteTask(event, this)" title="削除">✕</button>
+          </div>
+          <div class="item-card" data-exp="30" data-stats='{"int":3,"sen":2}' data-penalty='{"exp":30,"stats":{"int":2}}' onclick="toggleTask(event, this)">
+            <div class="item-title">📚 勉強：英単語コアイメージ・プレゼン作成 (4単語)</div>
+            <div class="item-rewards">
+              <span class="item-exp">+30 EXP</span>
+              <span class="stat-badge">+3 INT</span>
+              <span class="stat-badge">+2 SEN</span>
+              <span class="penalty-badge">未達成: -30 EXP / -2 INT</span>
+            </div>
+            <div class="checkbox"></div>
+            <button class="delete-btn" onclick="deleteTask(event, this)" title="削除">✕</button>
+          </div>
+        </div>
+
+        <div class="internal-gen-box">
+          <div class="internal-gen-title">🧠 内部システム自動能力割振 (クエスト追加)</div>
+          <input type="text" id="internal-quest-input" class="sys-input" style="width:100%; margin-bottom:6px;" placeholder="タスクを入力 (例: スクワット50回)">
+          <button class="sys-btn" style="width:100%; background:rgba(0,240,255,0.2);" onclick="generateQuestInternal('daily')">自動解析してクエストを追加</button>
+        </div>
+      </div>
+
+      <!-- SCHEDULE TAB -->
+      <div id="tab-schedule" class="tab-content">
+        <div class="panel-title">📅 TODAY'S SCHEDULE & AUTO STATS</div>
+        <div id="schedule-list">
+          <div class="item-card" data-exp="40" data-stats='{"str":2,"agi":2,"vit":1}' onclick="toggleTask(event, this)">
+            <span class="item-time">09:00</span>
+            <div class="item-title">バレーボール</div>
+            <div class="item-rewards"><span class="item-exp">+40 EXP</span><span class="stat-badge">+2 STR</span><span class="stat-badge">+2 AGI</span><span class="stat-badge">+1 VIT</span></div>
+            <div class="checkbox"></div>
+            <button class="delete-btn" onclick="deleteTask(event, this)" title="削除">✕</button>
+          </div>
+          <div class="item-card" data-exp="30" data-stats='{"vit":2,"agi":1}' onclick="toggleTask(event, this)">
+            <span class="item-time">16:30</span>
+            <div class="item-title">バイト</div>
+            <div class="item-rewards"><span class="item-exp">+30 EXP</span><span class="stat-badge">+2 VIT</span><span class="stat-badge">+1 AGI</span></div>
+            <div class="checkbox"></div>
+            <button class="delete-btn" onclick="deleteTask(event, this)" title="削除">✕</button>
+          </div>
+          <div class="item-card" data-exp="30" data-stats='{"int":3}' onclick="toggleTask(event, this)">
+            <span class="item-time">21:00</span>
+            <div class="item-title">勉強</div>
+            <div class="item-rewards"><span class="item-exp">+30 EXP</span><span class="stat-badge">+3 INT</span></div>
+            <div class="checkbox"></div>
+            <button class="delete-btn" onclick="deleteTask(event, this)" title="削除">✕</button>
+          </div>
+        </div>
+
+        <div class="internal-gen-box">
+          <div class="internal-gen-title">🧠 内部システム自動能力割振 (スケジュール追加)</div>
+          <input type="text" id="internal-schedule-input" class="sys-input" style="width:100%; margin-bottom:6px;" placeholder="予定を入力 (例: 14:00 図書館で自習)">
+          <button class="sys-btn" style="width:100%; background:rgba(0,240,255,0.2);" onclick="generateQuestInternal('schedule')">自動解析してスケジュールを追加</button>
+        </div>
+      </div>
+
+      <!-- WORLD MAP TAB -->
+      <div id="tab-map" class="tab-content">
+        <div class="panel-title">🗺️ HYRULE STYLE WORLD MAP</div>
+        <div id="leaflet-map"></div>
+        <div class="area-grid">
+          <div class="area-card-mini" id="area-card-home">
+            <div class="icon">🏠</div><div class="title">拠点 (E-RANK~)</div>
+            <button class="sys-btn" style="margin-top:5px; width:100%; font-size:0.6rem;" onclick="setBaseHere('home')">現在地登録</button>
+            <button id="checkin-btn-home" class="sys-btn" style="margin-top:3px; width:100%; font-size:0.6rem;" onclick="checkIn('home', 15)">Check-In (+15)</button>
+          </div>
+          <div class="area-card-mini" id="area-card-cafe">
+            <div class="icon">☕</div><div class="title">カフェ (D-RANK~)</div>
+            <button class="sys-btn" style="margin-top:5px; width:100%; font-size:0.6rem;" onclick="setBaseHere('cafe')">現在地登録</button>
+            <button id="checkin-btn-cafe" class="sys-btn" style="margin-top:3px; width:100%; font-size:0.6rem;" onclick="checkIn('cafe', 25)">Check-In (+25)</button>
+          </div>
+          <div class="area-card-mini" id="area-card-library">
+            <div class="icon">📚</div><div class="title">図書館 (C-RANK~)</div>
+            <button class="sys-btn" style="margin-top:5px; width:100%; font-size:0.6rem;" onclick="setBaseHere('library')">現在地登録</button>
+            <button id="checkin-btn-library" class="sys-btn" style="margin-top:3px; width:100%; font-size:0.6rem;" onclick="checkIn('library', 30)">Check-In (+30)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TARGET COUNTDOWN TAB -->
+      <div id="tab-countdown" class="tab-content">
+        <div class="panel-title">⏳ TARGET COUNTDOWN</div>
+        <div class="cd-card">
+          <div class="cd-target-name" id="cd-title-display">🎯 目標：昇格試験・重要目標</div>
+          <div style="font-size:0.7rem; color:var(--text-dim);" id="cd-target-date-display">目標日時: 未設定</div>
+          <div class="cd-timer-grid">
+            <div class="cd-time-unit"><div class="cd-val" id="cd-days">00</div><div class="cd-lbl">DAYS</div></div>
+            <div class="cd-time-unit"><div class="cd-val" id="cd-hours">00</div><div class="cd-lbl">HOURS</div></div>
+            <div class="cd-time-unit"><div class="cd-val" id="cd-mins">00</div><div class="cd-lbl">MINS</div></div>
+            <div class="cd-time-unit"><div class="cd-val" id="cd-secs">00</div><div class="cd-lbl">SECS</div></div>
+          </div>
+        </div>
+        <div style="background: rgba(15,23,42,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 10px; border-radius: 4px;">
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--neon-blue); margin-bottom:6px;">📌 新しい目標を設定</div>
+          <div class="cd-form">
+            <input type="text" id="input-cd-title" class="sys-input" placeholder="目標名（例: 資格試験）" oninput="saveTargetCountdown()">
+            <input type="datetime-local" id="input-cd-date" class="sys-input" onchange="saveTargetCountdown()">
+          </div>
+        </div>
+      </div>
+
+      <!-- SHOP TAB -->
+      <div id="tab-shop" class="tab-content">
+        <div class="panel-title">🛍️ SYSTEM BLACK MARKET (SHOP)</div>
+        <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 10px;">
+          獲得したEXPを消費して、システムから特殊アイテムや能力ブーストを購入せよ。
+        </div>
+        <div class="stats-list" style="gap: 8px;">
+          <div class="item-card" style="justify-content: space-between; cursor: default; flex-direction: column; align-items: stretch;">
+            <div>
+              <div class="item-title" style="font-weight:bold; color:var(--neon-gold);">🧪 高級体力回復ポーション</div>
+              <div style="font-size:0.65rem; color:var(--text-dim); margin-top:2px;">惰性（怠惰度）を -15 浄化します。</div>
+            </div>
+            <button class="sys-btn" style="margin-top:6px;" onclick="buyShopItem('laziness', 15, 50)">購入 (50 EXP)</button>
+          </div>
+          <div class="item-card" style="justify-content: space-between; cursor: default; flex-direction: column; align-items: stretch;">
+            <div>
+              <div class="item-title" style="font-weight:bold; color:var(--neon-blue);">📜 全ステータス覚醒の秘伝書</div>
+              <div style="font-size:0.65rem; color:var(--text-dim); margin-top:2px;">全ステータスが各 +1 上昇します。</div>
+            </div>
+            <button class="sys-btn" style="margin-top:6px;" onclick="buyShopItem('all_stats', 1, 150)">購入 (150 EXP)</button>
+          </div>
+          <div class="item-card" style="justify-content: space-between; cursor: default; flex-direction: column; align-items: stretch;">
+            <div>
+              <div class="item-title" style="font-weight:bold; color:var(--neon-purple);">🍀 幸運の四葉のクローバー</div>
+              <div style="font-size:0.65rem; color:var(--text-dim); margin-top:2px;">隠しLUCKステータスが +5 上昇します。</div>
+            </div>
+            <button class="sys-btn" style="margin-top:6px;" onclick="buyShopItem('luck', 5, 100)">購入 (100 EXP)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Log Terminal -->
+      <div class="log-terminal" id="sys-log">
+        <div class="log-line system">[SYSTEM] レスポンシブマトリックスエンジン起動完了。</div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: Timer & GPS -->
+    <div class="panel">
+      <div class="panel-title">⏱️ FOCUS TIMER</div>
+      <div class="timer-display" id="timer-display">25:00</div>
+      <div class="timer-preset">
+        <button class="btn-preset" onclick="setTimer(15)">15分</button>
+        <button class="btn-preset" onclick="setTimer(25)">25分</button>
+        <button class="btn-preset" onclick="setTimer(50)">50分</button>
+      </div>
+      <button class="btn-timer-ctrl btn-start" id="btn-timer" onclick="toggleTimer()">ポモドーロ開始 (+15 EXP / INT+1)</button>
+
+      <hr style="border-color: rgba(0,240,255,0.2); margin: 15px 0;">
+
+      <div class="panel-title">📍 GPS SATELLITE</div>
+      <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--neon-blue); line-height: 1.6;">
+        <div>LAT: <span id="gps-lat" style="color: #fff;">未取得</span></div>
+        <div>LNG: <span id="gps-lng" style="color: #fff;">未取得</span></div>
+        <div>精度: <span id="gps-acc" style="color: #fff;">--</span> m</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🚨 ペナルティモーダル UI 🚨 -->
+<div class="penalty-overlay" id="penalty-modal">
+  <div class="penalty-card">
+    <div class="penalty-title">⚠️ WARNING ⚠️</div>
+    <div class="penalty-sub">デイリークエスト未達成に伴う<br><strong style="color:#fff;">[ペナルティクエスト：生存試練]</strong> が発動しました。</div>
+    <div class="penalty-quest-box">
+      <strong>【人間卒業ペナルティ発動】</strong><br>
+      ☠️ 惰性の代償として、未達成クエスト1個につき惰性が **+10** 浸食しました。<br>
+      ☠️ システムへの忠誠を取り戻せ。
+    </div>
+    <button class="sys-btn danger" style="width:100%; padding:10px; font-size:0.9rem;" onclick="closePenaltyModal()">試練を受け入れる (完了)</button>
+  </div>
+</div>
+
+<!-- 🏆 実績＆称号選択モーダル -->
+<div class="modal-overlay" id="title-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span>🏆 称号＆実績システム</span>
+      <button style="background:none; border:none; color:var(--neon-red); font-weight:bold; font-size:1rem; cursor:pointer;" onclick="closeTitleModal()">✕</button>
+    </div>
+    <div class="title-list" id="title-list-container"></div>
+  </div>
+</div>
+
+<!-- 📝 キャラクリエイト診断モーダル -->
+<div class="survey-overlay" id="survey-modal" style="display:flex;">
+  <div class="survey-card">
+    <div class="panel-title" style="color: var(--neon-blue);">🧬 プレイヤー覚醒診断</div>
+    <div style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 8px;">ハンター名と、学歴・資格・生活習慣の項目を選択してください。</div>
+    
+    <div style="margin-bottom: 10px; background: rgba(0,240,255,0.05); border: 1px solid var(--neon-blue); padding: 8px; border-radius: 4px;">
+      <div style="font-size: 0.75rem; font-weight: bold; color: var(--neon-blue); margin-bottom: 4px;">👤 ハンター名設定</div>
+      <input type="text" id="survey-input-name" class="sys-input" style="width:100%;" value="水篠 旬">
+    </div>
+
+    <div class="survey-body">
+      <div class="survey-section">
+        <div class="survey-section-title">🎓 学歴・アカデミック基盤 (INT / SEN)</div>
+        <label class="survey-option-label"><input type="checkbox" name="survey-edu" value="top_uni"> 旧帝大・難関国立・早慶・海外トップ大学 修了/在籍 [+50 INT / +30 SEN]</label>
+        <label class="survey-option-label"><input type="checkbox" name="survey-edu" value="univ"> 一般大学・高専・大学院 修了/在籍 [+30 INT / +20 SEN]</label>
+        <label class="survey-option-label"><input type="checkbox" name="survey-edu" value="junior_col"> 短大・専門学校 卒業 [+20 INT / +10 SEN]</label>
+      </div>
+
+      <div class="survey-section">
+        <div class="survey-section-title">📚 資格・専門実績 (INT)</div>
+        <label class="survey-option-label"><input type="checkbox" name="survey-cert" value="national_top"> 国家最高峰（司法試験予備試験、公認会計士など） [+100 INT]</label>
+        <label class="survey-option-label"><input type="checkbox" name="survey-cert" value="national_high"> 高度国家資格（中小企業診断士など） [+70 INT]</label>
+        <label class="survey-option-label"><input type="checkbox" name="survey-cert" value="mid"> 中級専門資格（応用情報、簿記2級、宅建など） [+45 INT]</label>
+        <label class="survey-option-label"><input type="checkbox" name="survey-cert" value="basic"> 初級・基礎資格（基本情報、ITパスポートなど） [+30 INT]</label>
+        <label class="survey-option-label"><input type="checkbox" name="survey-cert" value="lang"> 語学力（TOEIC 900超 / 英検1級など） [+50 INT / +30 SEN]</label>
+      </div>
+
+      <div class="survey-section">
+        <div class="survey-section-title">🔥 筋力・肉体実績 (STR / VIT)</div>
+        <label class="survey-option-label"><input type="checkbox" name="survey-body" value="athlete"> トップアスリート級・長期の高重量トレ [+100 STR / +50 VIT]</label>
+        <label class="survey-option-label"><input type="checkbox" name="survey-body" value="hard_gym"> 週3回以上の高負荷ウェイトトレーニング [+70 STR / +30 VIT]</label>
+        <label class="survey-option-label"><input type="checkbox" name="survey-body" value="marathon"> フルマラソン完走・有酸素持久力 [+45 STR / +45 VIT]</label>
+        <label class="survey-option-label"><input type="checkbox" name="survey-body" value="light_gym"> 週数回のジム通い・軽度な運動習慣 [+30 STR / +20 VIT]</label>
+      </div>
+
+      <div class="survey-section">
+        <div class="survey-section-title">⚡ 敏捷・行動力・マルチタスク (AGI)</div>
+        <label class="survey-option-label"><input type="checkbox" name="survey-agi" value="extreme_multi"> 複数事業経営・副業と学業/本業の完全並行 [+70 AGI]</label>
+        <label class="survey-option-label"><input type="checkbox" name="survey-agi" value="strict_task"> タスク管理・スケジュール管理を毎日運用 [+45 AGI]</label>
+        <label class="survey-option-label"><input type="checkbox" name="survey-agi" value="rookie_action"> 日常のルーティン行動が一定定着している [+30 AGI]</label>
+      </div>
+
+      <div class="survey-section">
+        <div class="survey-section-title">✨ 感覚・クリエイティブ (SEN)</div>
+        <label class="survey-option-label"><input type="checkbox" name="survey-sen" value="pro_tech"> プログラミング開発（実務）、楽器演奏（上級） [+70 SEN]</label>
+        <label class="survey-option-label"><input type="checkbox" name="survey-sen" value="hobby_tech"> 個人開発・趣味でのクリエイティブ制作継続 [+45 SEN]</label>
+      </div>
+    </div>
+
+    <button class="sys-btn" style="width:100%; padding:10px; font-size:0.85rem; background: var(--neon-blue); color:#000;" onclick="submitCharacterSurvey()">覚醒を完了する (ゲーム開始)</button>
+  </div>
+</div>
+
+<script>
+  const ACHIEVEMENTS = [
+    { id: "e_int", rank: "E-RANK", name: "見習い探求者 (INT)", desc: "すべての始まり。最初の基礎学習をクリアした段階。", statReq: { int: 30 }, buff: { int: 2 }, expMultiplier: 1.0, statMultiplier: 1.0, req: (p) => p.stats.int >= 30 && p.stats.int < 45 },
+    { id: "e_str", rank: "E-RANK", name: "新米の肉体 (STR)", desc: "生活習慣の確立と最初の基礎運動をクリアした段階。", statReq: { str: 30 }, buff: { str: 2 }, expMultiplier: 1.0, statMultiplier: 1.0, req: (p) => p.stats.str >= 30 && p.stats.str < 45 },
+    { id: "e_agi", rank: "E-RANK", name: "ルーキー行動者 (AGI)", desc: "行動の第一歩を踏み出した証。", statReq: { agi: 30 }, buff: { agi: 2 }, expMultiplier: 1.0, statMultiplier: 1.0, req: (p) => p.stats.agi >= 30 && p.stats.agi < 45 },
+
+    { id: "d_int", rank: "D-RANK", name: "初級専門家 / 知識の探求者", desc: "初級・基礎専門レベル（基本情報や宅建など）を習得。", statReq: { int: 45 }, buff: { int: 5 }, expMultiplier: 1.2, statMultiplier: 1.1, req: (p) => p.stats.int >= 45 && p.stats.int < 70 },
+    { id: "d_str", rank: "D-RANK", name: "鍛えられし肉体", desc: "週数回のジム通いなど、日常のルーティンが安定した証。", statReq: { str: 45 }, buff: { str: 5 }, expMultiplier: 1.2, statMultiplier: 1.1, req: (p) => p.stats.str >= 45 && p.stats.str < 70 },
+    { id: "d_agi", rank: "D-RANK", name: "タスク管理の熟練者", desc: "日常のスケジュールやタスク運用が定着した証。", statReq: { agi: 45 }, buff: { agi: 5 }, expMultiplier: 1.2, statMultiplier: 1.1, req: (p) => p.stats.agi >= 45 && p.stats.agi < 70 },
+
+    { id: "c_int", rank: "C-RANK", name: "実務の精鋭 / 応用智者", desc: "中級・実務専門レベルを突破。", statReq: { int: 70 }, buff: { int: 10, sen: 5 }, expMultiplier: 1.4, statMultiplier: 1.2, req: (p) => p.stats.int >= 70 && p.stats.int < 100 },
+    { id: "c_str", rank: "C-RANK", name: "鋼の肉体", desc: "社会で即戦力となる肉体領域。", statReq: { str: 70 }, buff: { str: 10, vit: 5 }, expMultiplier: 1.4, statMultiplier: 1.2, req: (p) => p.stats.str >= 70 && p.stats.str < 100 },
+    { id: "c_agi", rank: "C-RANK", name: "高速演算の体現者", desc: "高度なマルチタスクと行動最適化を達成。", statReq: { agi: 70 }, buff: { agi: 10 }, expMultiplier: 1.4, statMultiplier: 1.2, req: (p) => p.stats.agi >= 70 && p.stats.agi < 100 },
+
+    { id: "b_int", rank: "B-RANK", name: "難関の覇者 / 賢哲", desc: "難関資格や高度専門領域に到達。", statReq: { int: 100 }, buff: { int: 20, sen: 10 }, expMultiplier: 1.7, statMultiplier: 1.4, req: (p) => p.stats.int >= 100 && p.stats.int < 150 },
+    { id: "b_str", rank: "B-RANK", name: "超克の巨獣", desc: "長期的努力による肉体改造の結晶。", statReq: { str: 100 }, buff: { str: 20, vit: 10 }, expMultiplier: 1.7, statMultiplier: 1.4, req: (p) => p.stats.str >= 100 && p.stats.str < 150 },
+    { id: "b_agi", rank: "B-RANK", name: "鉄壁のコンディショナー", desc: "自己管理と行動持続の極み。", statReq: { agi: 100 }, buff: { agi: 20 }, expMultiplier: 1.7, statMultiplier: 1.4, req: (p) => p.stats.agi >= 100 && p.stats.agi < 150 },
+
+    { id: "a_int", rank: "A-RANK", name: "国家の知性 / 法と真理の体現者", desc: "超難関・国家資格を制覇。", statReq: { int: 150 }, buff: { int: 35, sen: 20 }, expMultiplier: 2.2, statMultiplier: 1.8, req: (p) => p.stats.int >= 150 && p.stats.int < 200 },
+    { id: "a_str", rank: "A-RANK", name: "神話級の肉体", desc: "トップアスリート級の肉体と実績を構築。", statReq: { str: 150 }, buff: { str: 35, vit: 20 }, expMultiplier: 2.2, statMultiplier: 1.8, req: (p) => p.stats.str >= 150 && p.stats.str < 200 },
+    { id: "a_agi", rank: "A-RANK", name: "至高の効率主義者", desc: "社会のトップ層に君臨する圧倒的な生産性。", statReq: { agi: 150 }, buff: { agi: 35 }, expMultiplier: 2.2, statMultiplier: 1.8, req: (p) => p.stats.agi >= 150 && p.stats.agi < 200 },
+
+    { id: "nat_int", rank: "NATIONAL-RANK", name: "世界の頂点 / 万象の統率者", desc: "人間の限界領域を突破。", statReq: { int: 200 }, buff: { int: 60, sen: 40 }, expMultiplier: 3.0, statMultiplier: 2.5, req: (p) => p.stats.int >= 200 },
+    { id: "nat_str", rank: "NATIONAL-RANK", name: "人知を超えし肉体", desc: "肉体の限界を超えた究極の到達点。", statReq: { str: 200 }, buff: { str: 60, vit: 40 }, expMultiplier: 3.0, statMultiplier: 2.5, req: (p) => p.stats.str >= 200 },
+    { id: "nat_agi", rank: "NATIONAL-RANK", name: "完全無欠の全能者", desc: "世界レベルの成果・研究を成し遂げた究極の存在。", statReq: { agi: 200 }, buff: { agi: 60, int: 30 }, expMultiplier: 3.0, statMultiplier: 2.5, req: (p) => p.stats.agi >= 200 },
+
+    { id: "hc_3days", rank: "HARDCORE", name: "修羅の片鱗", desc: "鬼畜モードを3日間耐え抜いた証。", statReq: {}, buff: { str: 3, int: 3 }, expMultiplier: 1.1, statMultiplier: 1.0, req: (p) => p.hardcoreMode && calculateHardcoreDays() >= 3 },
+    { id: "hc_7days", rank: "HARDCORE", name: "不屈の精神", desc: "過酷な環境を1週間耐え抜いた不屈のハンター。", statReq: {}, buff: { str: 7, int: 7, agi: 5 }, expMultiplier: 1.3, statMultiplier: 1.1, req: (p) => p.hardcoreMode && calculateHardcoreDays() >= 7 },
+    { id: "hc_14days", rank: "HARDCORE", name: "鬼神の領域", desc: "鬼畜モードで2週間生き残り、惰性を完全にねじ伏せた者。", statReq: {}, buff: { str: 15, int: 15, vit: 10 }, expMultiplier: 1.6, statMultiplier: 1.3, req: (p) => p.hardcoreMode && calculateHardcoreDays() >= 14 },
+    { id: "hc_30days", rank: "HARDCORE", name: "絶対的支配者 (シャドウモナーク)", desc: "30日間にわたり鬼畜モードを完遂し、システムすら超越した存在。", statReq: {}, buff: { str: 30, int: 30, agi: 25, sen: 25, vit: 25 }, expMultiplier: 2.2, statMultiplier: 1.8, req: (p) => p.hardcoreMode && calculateHardcoreDays() >= 30 }
+  ];
+
+  const RANK_REQUIREMENTS = [
+    { rank: "E-RANK", nextRank: "D-RANK", minLevel: 1, minStat: 45 },
+    { rank: "D-RANK", nextRank: "C-RANK", minLevel: 15, minStat: 70 },
+    { rank: "C-RANK", nextRank: "B-RANK", minLevel: 40, minStat: 100 },
+    { rank: "B-RANK", nextRank: "A-RANK", minLevel: 90, minStat: 150 },
+    { rank: "A-RANK", nextRank: "NATIONAL-RANK", minLevel: 180, minStat: 200 },
+    { rank: "NATIONAL-RANK", nextRank: "MAX", minLevel: 350, minStat: 250 }
+  ];
+
+  let playerState = { 
+    name: "水篠 旬",
+    rank: "E-RANK",
+    equippedTitleId: "e_int",
+    unlockedTitles: ["e_int"],
+    level: 1, exp: 0, maxExp: 100, 
+    pomoCount: 0,
+    checkinCount: 0,
+    laziness: 10, 
+    luck: 10, 
+    stats: { str: 10, int: 10, agi: 10, vit: 10, sen: 10 },
+    dailySkillGains: {},
+    checkedInToday: {},
+    hardcoreMode: false,
+    hardcoreStartDate: null,
+    lastActiveDate: "",
+    isInitialized: false
+  };
+
+  let map = null;
+  let mapMarkers = {};
+
+  const DEFAULT_LOCATIONS = {
+    home: { name: "拠点 (E-RANK)", lat: 35.6812, lng: 139.7671, icon: "🏠", radius: 0.05, reqRank: "E-RANK" },
+    cafe: { name: "カフェ (D-RANK)", lat: 35.6825, lng: 139.7690, icon: "☕", radius: 0.1, reqRank: "D-RANK" },
+    library: { name: "図書館 (C-RANK)", lat: 35.6800, lng: 139.7650, icon: "📚", radius: 0.15, reqRank: "C-RANK" }
+  };
+  let locations = DEFAULT_LOCATIONS;
+  let targetCountdown = { title: "🎯 目標：昇格試験・重要目標", targetDate: null };
+
+  let timerInterval = null;
+  let timeLeft = 1500;
+  let isTimerRunning = false;
+  let currentPresetTime = 1500;
+
+  function logMessage(text, type = 'normal') {
+    const logBox = document.getElementById('sys-log');
+    if (!logBox) return;
+    const line = document.createElement('div');
+    line.className = `log-line ${type}`;
+    line.innerText = `> ${text}`;
+    logBox.appendChild(line);
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  function getLocalDateString(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function calculateHardcoreDays() {
+    if (!playerState.hardcoreMode || !playerState.hardcoreStartDate) return 0;
+    const start = new Date(playerState.hardcoreStartDate);
+    const now = new Date();
+    start.setHours(0, 0, 0, 0);
+    now.setHours(0, 0, 0, 0);
+    const diffTime = now - start;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays) + 1;
+  }
+
+  const STORAGE_KEY = "solo_leveling_system_matrix_v7";
+
+  function saveGame() {
+    try {
+      playerState.lastActiveDate = getLocalDateString();
+      const saveData = {
+        playerState: playerState,
+        locations: locations,
+        targetCountdown: targetCountdown,
+        dailyHtml: document.getElementById('daily-quest-list').innerHTML,
+        scheduleHtml: document.getElementById('schedule-list').innerHTML,
+        savedAt: new Date().toISOString()
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+      
+      const indicator = document.getElementById('autosave-status');
+      if (indicator) {
+        indicator.innerText = "💾 保存完了";
+        indicator.style.color = "var(--neon-blue)";
+        setTimeout(() => {
+          indicator.innerText = "💾 自動保存: 有効";
+          indicator.style.color = "var(--neon-green)";
+        }, 1500);
+      }
+    } catch (e) {
+      console.error("Autosave failed:", e);
+    }
+  }
+
+  function loadGame() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return false;
+      const data = JSON.parse(saved);
+
+      if (data.playerState) {
+        playerState = data.playerState;
+        if (!playerState.rank) playerState.rank = "E-RANK";
+        if (playerState.hardcoreMode === undefined) playerState.hardcoreMode = false;
+        
+        checkHardcoreDailyPenalty(playerState);
+      }
+      if (data.locations) locations = data.locations;
+      if (data.targetCountdown) targetCountdown = data.targetCountdown;
+      
+      if (data.dailyHtml) document.getElementById('daily-quest-list').innerHTML = data.dailyHtml;
+      if (data.scheduleHtml) document.getElementById('schedule-list').innerHTML = data.scheduleHtml;
+
+      const toggleEl = document.getElementById('hardcore-toggle');
+      if (toggleEl) toggleEl.checked = playerState.hardcoreMode;
+
+      if (targetCountdown.title) {
+        const cleanTitle = targetCountdown.title.replace("🎯 目標：", "");
+        const titleInput = document.getElementById('input-cd-title');
+        if(titleInput) titleInput.value = cleanTitle;
+      }
+      if (targetCountdown.targetDate) {
+        const dateInput = document.getElementById('input-cd-date');
+        if(dateInput) {
+          const d = new Date(targetCountdown.targetDate);
+          dateInput.value = d.toISOString().slice(0, 16);
+        }
+      }
+
+      logMessage("📂 セーブデータを復元しました。", "system");
+      return true;
+    } catch (e) {
+      console.error("Load failed:", e);
+      return false;
+    }
+  }
+
+  function toggleHardcoreMode() {
+    const toggleEl = document.getElementById('hardcore-toggle');
+    playerState.hardcoreMode = toggleEl.checked;
+    
+    if (playerState.hardcoreMode) {
+      if (!playerState.hardcoreStartDate) {
+        playerState.hardcoreStartDate = getLocalDateString();
+      }
+      logMessage(`💀【鬼畜モード起動】ペナルティシステムが作動しました。`, "danger");
+      alert("💀 鬼畜モードを有効にしました。未達タスクに対しペナルティが課されます！");
+    } else {
+      logMessage("🛡️ 鬼畜モードを解除しました。", "system");
+    }
+    updateHardcoreUI();
+    saveGame();
+  }
+
+  function updateHardcoreUI() {
+    const daysDisplayEl = document.getElementById('hardcore-days-display');
+    const daysValEl = document.getElementById('hardcore-days-val');
+    
+    if (playerState.hardcoreMode) {
+      daysDisplayEl.style.display = 'block';
+      daysValEl.innerText = calculateHardcoreDays();
+    } else {
+      daysDisplayEl.style.display = 'none';
+    }
+  }
+
+  function checkHardcoreDailyPenalty(pState) {
+    if (!pState.hardcoreMode) return;
+    const today = getLocalDateString();
+    if (pState.lastActiveDate && pState.lastActiveDate !== today) {
+      const uncompletedCount = 4;
+      pState.laziness = Math.min(100, (pState.laziness || 10) + uncompletedCount * 5);
+      
+      ['str', 'int', 'agi', 'vit', 'sen'].forEach(k => {
+        pState.stats[k] = Math.max(5, pState.stats[k] - 1);
+      });
+      
+      logMessage(`💀【鬼畜ペナルティ】ログイン日更新に伴い、惰性が蓄積しました！`, "danger");
+    }
+  }
+
+  function resetAllData() {
+    if (confirm("⚠️ すべてのセーブデータがリセットされます。よろしいですか？")) {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.clear();
+      location.reload();
+    }
+  }
+
+  function importDataFromJson(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const jsonStr = e.target.result;
+        JSON.parse(jsonStr);
+        localStorage.setItem(STORAGE_KEY, jsonStr);
+        alert("📥 読み込み成功。システムを再起動します。");
+        location.reload();
+      } catch (err) {
+        alert("❌ 無効なファイルです。");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function exportDataJson() {
+    const saved = localStorage.getItem(STORAGE_KEY) || "{}";
+    const blob = new Blob([saved], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `solo_leveling_matrix_save_${getLocalDateString()}.json`;
+    a.click();
+    logMessage("📤 セーブデータを書き出しました。", "system");
+  }
+
+  function editPlayerName() {
+    const newName = prompt("新しいハンター名を入力してください:", playerState.name);
+    if (newName && newName.trim() !== "") {
+      playerState.name = newName.trim();
+      document.getElementById('player-name-display').innerText = playerState.name;
+      logMessage(`👤 ハンター名を [${playerState.name}] に更新しました。`, "system");
+      saveGame();
+    }
+  }
+
+  function openTitleModal() {
+    renderTitleList();
+    document.getElementById('title-modal').style.display = 'flex';
+  }
+
+  function closeTitleModal() {
+    document.getElementById('title-modal').style.display = 'none';
+  }
+
+  function equipTitle(titleId) {
+    if (!playerState.unlockedTitles.includes(titleId)) return;
+    playerState.equippedTitleId = titleId;
+    const titleObj = ACHIEVEMENTS.find(a => a.id === titleId);
+    logMessage(`🏷️ 称号【${titleObj.name}】を装着しました！`, "system");
+    renderTitleList();
+    updateUI();
+    saveGame();
+  }
+
+  function renderTitleList() {
+    const container = document.getElementById('title-list-container');
+    container.innerHTML = '';
+
+    ACHIEVEMENTS.forEach(ach => {
+      const isUnlocked = playerState.unlockedTitles.includes(ach.id);
+      const isEquipped = playerState.equippedTitleId === ach.id;
+
+      const item = document.createElement('div');
+      item.className = `title-item ${isUnlocked ? 'unlocked' : ''} ${isEquipped ? 'equipped' : ''}`;
+
+      let buffTexts = [];
+      if (ach.buff) {
+        Object.keys(ach.buff).forEach(b => buffTexts.push(`${b.toUpperCase()}+${ach.buff[b]}`));
+      }
+      if (ach.expMultiplier && ach.expMultiplier > 1.0) {
+        buffTexts.push(`獲得EXP x${ach.expMultiplier}`);
+      }
+      const buffStr = buffTexts.length > 0 ? ` [バフ: ${buffTexts.join(', ')}]` : '';
+
+      let reqDesc = "";
+      if (ach.statReq && Object.keys(ach.statReq).length > 0) {
+        const keys = Object.keys(ach.statReq);
+        reqDesc = `条件: ${keys[0].toUpperCase()} ${ach.statReq[keys[0]]}以上`;
+      } else if (ach.id.startsWith("hc_")) {
+        const daysMap = { hc_3days: 3, hc_7days: 7, hc_14days: 14, hc_30days: 30 };
+        reqDesc = `条件: 鬼畜 ${daysMap[ach.id]}日目以上`;
+      }
+
+      item.innerHTML = `
+        <div class="title-info">
+          <div class="title-name-text">[${ach.rank}] ${isUnlocked ? ach.name : '🔒 ??????'} ${isEquipped ? ' (装着中)' : ''}</div>
+          <div class="title-desc">${ach.desc} (${reqDesc})</div>
+          ${isUnlocked && buffStr ? `<div class="title-buff">${buffStr}</div>` : ''}
+          ${!isUnlocked ? `<div class="title-lock-tag">未解放</div>` : ''}
+        </div>
+        <div>
+          ${isUnlocked ? `
+            <button class="sys-btn" style="font-size:0.65rem; padding:4px 8px;" onclick="equipTitle('${ach.id}')" ${isEquipped ? 'disabled' : ''}>
+              ${isEquipped ? '装着中' : '装着'}
+            </button>
+          ` : ''}
+        </div>
+      `;
+      container.appendChild(item);
+    });
+  }
+
+  function checkAchievements() {
+    ACHIEVEMENTS.forEach(ach => {
+      if (!playerState.unlockedTitles.includes(ach.id)) {
+        if (ach.req(playerState)) {
+          playerState.unlockedTitles.push(ach.id);
+          logMessage(`🏆 称号【${ach.name}】が自動解放されました！`, "system");
+        }
+      }
+    });
+  }
+
+  function getCurrentRankRequirement() {
+    return RANK_REQUIREMENTS.find(r => r.rank === playerState.rank) || RANK_REQUIREMENTS[RANK_REQUIREMENTS.length - 1];
+  }
+
+  function tryRankUp() {
+    const req = getCurrentRankRequirement();
+    if (req.rank === "NATIONAL-RANK") {
+      alert("👑 すでに最高峰のナショナル級に到達しています！");
+      return;
+    }
+
+    const currentStats = playerState.stats;
+    const minStatMet = currentStats.str >= req.minStat &&
+                       currentStats.int >= req.minStat &&
+                       currentStats.agi >= req.minStat &&
+                       currentStats.vit >= req.minStat &&
+                       currentStats.sen >= req.minStat;
+    const levelMet = playerState.level >= req.minLevel;
+
+    if (levelMet && minStatMet) {
+      playerState.rank = req.nextRank;
+      logMessage(`🎉 昇格試験合格！ ハンターランクが 【${playerState.rank}】 へ昇格しました！`, "system");
+      alert(`🎉 昇格試験合格！ ハンターランクが 【${playerState.rank}】 に昇格しました！`);
+      updateUI();
+      saveGame();
+    } else {
+      alert(`❌ 昇格試験不合格\n条件を満たしていません。ステータスとレベルをさらに鍛えよ！`);
+    }
+  }
+
+  function submitCharacterSurvey() {
+    const inputName = document.getElementById('survey-input-name').value.trim();
+    if (inputName) {
+      playerState.name = inputName;
+      document.getElementById('player-name-display').innerText = playerState.name;
+    }
+
+    let stats = { str: 10, int: 10, agi: 10, vit: 10, sen: 10 };
+
+    const checkedBoxes = document.querySelectorAll('.survey-overlay input[type="checkbox"]:checked');
+    checkedBoxes.forEach(cb => {
+      const val = cb.value;
+      if (val === 'top_uni') { stats.int += 50; stats.sen += 30; }
+      if (val === 'univ') { stats.int += 30; stats.sen += 20; }
+      if (val === 'junior_col') { stats.int += 20; stats.sen += 10; }
+      if (val === 'national_top') { stats.int += 100; }
+      if (val === 'national_high') { stats.int += 70; }
+      if (val === 'mid') { stats.int += 45; }
+      if (val === 'basic') { stats.int += 30; }
+      if (val === 'lang') { stats.int += 50; stats.sen += 30; }
+      if (val === 'athlete') { stats.str += 100; stats.vit += 50; }
+      if (val === 'hard_gym') { stats.str += 70; stats.vit += 30; }
+      if (val === 'marathon') { stats.str += 45; stats.vit += 45; }
+      if (val === 'light_gym') { stats.str += 30; stats.vit += 20; }
+      if (val === 'extreme_multi') { stats.agi += 70; }
+      if (val === 'strict_task') { stats.agi += 45; }
+      if (val === 'rookie_action') { stats.agi += 30; }
+      if (val === 'pro_tech') { stats.sen += 70; }
+      if (val === 'hobby_tech') { stats.sen += 45; }
+    });
+
+    playerState.stats = stats;
+    playerState.isInitialized = true;
+
+    let currentRank = RANK_REQUIREMENTS[0];
+    for (let tier of RANK_REQUIREMENTS) {
+      if (stats.str >= tier.minStat && stats.int >= tier.minStat && 
+          stats.agi >= tier.minStat && stats.vit >= tier.minStat && stats.sen >= tier.minStat) {
+        currentRank = tier;
+      }
+    }
+    playerState.rank = currentRank.rank;
+
+    document.getElementById('survey-modal').style.display = 'none';
+    logMessage(`🧬 キャラクター作成完了。ハンター名[${playerState.name}]が確定しました。`, "system");
+    
+    updateUI();
+    saveGame();
+  }
+
+  function evaluateDailyPenalty() {
+    const uncompletedTasks = document.querySelectorAll('#daily-quest-list .item-card:not(.completed)');
+    
+    if (uncompletedTasks.length === 0) {
+      alert("🎉 すべてのデイリークエストを達成しています！ペナルティはありません。");
+      return;
+    }
+
+    let totalExpLoss = 0;
+    let statLossMap = {};
+
+    uncompletedTasks.forEach(task => {
+      const pData = JSON.parse(task.getAttribute('data-penalty') || "{}");
+      if (pData.exp) totalExpLoss += pData.exp;
+      if (pData.stats) {
+        Object.keys(pData.stats).forEach(st => {
+          statLossMap[st] = (statLossMap[st] || 0) + pData.stats[st];
+        });
+      }
+    });
+
+    const lazinessGain = uncompletedTasks.length * 10;
+    playerState.laziness = Math.min(100, (playerState.laziness || 0) + lazinessGain);
+
+    addExp(-totalExpLoss);
+    Object.keys(statLossMap).forEach(st => {
+      playerState.stats[st] = Math.max(0, playerState.stats[st] - statLossMap[st]);
+    });
+
+    logMessage(`💀 未達成クエスト${uncompletedTasks.length}件検知！ ペナルティ発動`, 'danger');
+    updateUI();
+    document.getElementById('penalty-modal').style.display = 'flex';
+    saveGame();
+  }
+
+  function closePenaltyModal() {
+    document.getElementById('penalty-modal').style.display = 'none';
+    logMessage(`⚔️ ペナルティクエスト完了を記録しました。`, "warn");
+    saveGame();
+  }
+
+  function triggerDeathLoop() {
+    logMessage(`💀【死に戻り発動】惰性（怠惰度）が 100 に到達しました...！`, "danger");
+    
+    playerState.level = 1;
+    playerState.exp = 0;
+    playerState.maxExp = 100;
+    playerState.stats = { str: 10, int: 10, agi: 10, vit: 10, sen: 10 };
+    playerState.laziness = 0;
+    playerState.isInitialized = false;
+
+    alert("💀【死に戻りシステム発動】\n\n怠惰の極み（惰性100）に達したため、システムが強制リセットされました！");
+    
+    document.getElementById('survey-modal').style.display = 'flex';
+    updateUI();
+    saveGame();
+  }
+
+  function generateQuestInternal(type) {
+    const inputId = type === 'daily' ? 'internal-quest-input' : 'internal-schedule-input';
+    const containerId = type === 'daily' ? 'daily-quest-list' : 'schedule-list';
+    const textVal = document.getElementById(inputId).value.trim();
+
+    if (!textVal) return;
+
+    let stats = {};
+    let exp = 25;
+    let timeStr = "12:00";
+
+    const timeMatch = textVal.match(/([0-1]?[0-9]|2[0-3]):([0-5][0-9])/);
+    if (timeMatch) timeStr = timeMatch[0];
+
+    const lowerText = textVal.toLowerCase();
+
+    if (/筋トレ|スクワット|腕立て|プッシュ|ディップス|ランニング|走|ジョギング|バレー|ジム|筋力|ダンベル/.test(lowerText)) {
+      stats.str = 2; stats.vit = 1; exp += 10;
+    }
+    if (/勉強|英単語|英語|単語|読書|本|プログラミング|コード|開発|資格|試験|課題|レポート|学習|講義|授業/.test(lowerText)) {
+      stats.int = 3; stats.sen = 1; exp += 15;
+    }
+    if (/バイト|仕事|勤務|移動|ウォーキング|散歩|ストレッチ|ヨガ|敏捷|素早/.test(lowerText)) {
+      stats.agi = 2; stats.vit = 1; exp += 10;
+    }
+    if (/睡眠|寝|休息|瞑想|ドローイング|呼吸|体力|持久/.test(lowerText)) {
+      stats.vit = 3; exp += 5;
+    }
+
+    if (Object.keys(stats).length === 0) { stats.sen = 2; stats.int = 1; }
+
+    const container = document.getElementById(containerId);
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.setAttribute('data-exp', exp);
+    card.setAttribute('data-stats', JSON.stringify(stats));
+    
+    if (type === 'daily') {
+      card.setAttribute('data-penalty', JSON.stringify({ exp: Math.round(exp/2), stats: { str: 1 } }));
+    }
+    card.onclick = function(event) { toggleTask(event, this); };
+
+    let statBadges = '';
+    Object.keys(stats).forEach(s => {
+      statBadges += `<span class="stat-badge">+${stats[s]} ${s.toUpperCase()}</span>`;
+    });
+
+    let penaltyBadge = type === 'daily' ? `<span class="penalty-badge">未達成: -${Math.round(exp/2)} EXP</span>` : '';
+    const timeDisplay = type === 'schedule' ? `<span class="item-time">${timeStr}</span>` : '';
+
+    card.innerHTML = `
+      ${timeDisplay}
+      <div class="item-title">${textVal}</div>
+      <div class="item-rewards"><span class="item-exp">+${exp} EXP</span>${statBadges}${penaltyBadge}</div>
+      <div class="checkbox"></div>
+      <button class="delete-btn" onclick="deleteTask(event, this)" title="削除">✕</button>
+    `;
+
+    container.appendChild(card);
+    document.getElementById(inputId).value = '';
+    logMessage(`🧠 内部システム解析完了: [${textVal}]`, "system");
+    saveGame();
+  }
+
+  function toggleTask(event, element) {
+    if (event && event.target.classList.contains('delete-btn')) return;
+    if (element.dataset.processing === "true") return;
+    element.dataset.processing = "true";
+    setTimeout(() => { delete element.dataset.processing; }, 300);
+
+    const expAmount = parseInt(element.getAttribute('data-exp') || "0");
+    const statsData = JSON.parse(element.getAttribute('data-stats') || "{}");
+    const isCompleted = element.classList.toggle('completed');
+
+    let logStats = [];
+    const currentTitleObj = ACHIEVEMENTS.find(a => a.id === playerState.equippedTitleId) || ACHIEVEMENTS[0];
+    const expMult = currentTitleObj.expMultiplier || 1.0;
+    const statMult = currentTitleObj.statMultiplier || 1.0;
+
+    if (isCompleted) {
+      const finalExp = Math.round(expAmount * expMult);
+      addExp(finalExp);
+
+      Object.keys(statsData).forEach(stat => {
+        const rawVal = statsData[stat];
+        const finalVal = Math.max(1, Math.round(rawVal * statMult));
+        playerState.stats[stat] += finalVal;
+        logStats.push(`${stat.toUpperCase()} +${finalVal}`);
+      });
+      logMessage(`⚔️ クエスト達成: +${finalExp} EXP (${logStats.join(', ')})`, 'system');
+    } else {
+      const finalExp = Math.round(expAmount * expMult);
+      addExp(-finalExp);
+      Object.keys(statsData).forEach(stat => {
+        const rawVal = statsData[stat];
+        const finalVal = Math.max(1, Math.round(rawVal * statMult));
+        playerState.stats[stat] = Math.max(0, playerState.stats[stat] - finalVal);
+        logStats.push(`${stat.toUpperCase()} -${finalVal}`);
+      });
+      logMessage(`⚠️ クエスト取消: ${logStats.join(', ')}`, 'warn');
+    }
+    updateUI();
+    saveGame();
+  }
+
+  function deleteTask(event, btnElement) {
+    event.stopPropagation();
+    if (confirm("🗑️ 削除しますか？")) {
+      const card = btnElement.closest('.item-card');
+      if (card) {
+        card.remove();
+        logMessage("🗑️ 項目を削除しました。", "warn");
+        saveGame();
+      }
+    }
+  }
+
+  function buyShopItem(type, value, cost) {
+    if (playerState.exp < cost) {
+      alert(`❌ EXPが不足しています！ (現在: ${playerState.exp} EXP)`);
+      return;
+    }
+    playerState.exp -= cost;
+    if (type === 'laziness') {
+      playerState.laziness = Math.max(0, (playerState.laziness || 10) - value);
+      alert(`🧪 ポーション効果で惰性が ${value} 浄化されました！`);
+    } else if (type === 'all_stats') {
+      ['str', 'int', 'agi', 'vit', 'sen'].forEach(k => { playerState.stats[k] += value; });
+      alert(`📜 秘伝書効果で全ステータスが +${value} 向上しました！`);
+    } else if (type === 'luck') {
+      playerState.luck = (playerState.luck || 10) + value;
+      alert(`🍀 LUCKが +${value} 向上しました！`);
+    }
+    updateUI();
+    saveGame();
+  }
+
+  function initBotwMap() {
+    map = L.map('leaflet-map').setView([35.6812, 139.7671], 15);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+    renderMapMarkers();
+  }
+
+  function renderMapMarkers() {
+    if (!map) return;
+    Object.keys(mapMarkers).forEach(k => map.removeLayer(mapMarkers[k]));
+    mapMarkers = {};
+
+    Object.keys(locations).forEach(key => {
+      const loc = locations[key];
+      if (loc.lat && loc.lng) {
+        const customIcon = L.divIcon({
+          className: 'botw-pin',
+          html: loc.icon,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
+        });
+        const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(map);
+        marker.bindPopup(`<b>${loc.name}</b>`);
+        mapMarkers[key] = marker;
+      }
+    });
+  }
+
+  function addExp(amount) {
+    playerState.exp += amount;
+    while (playerState.exp < 0) {
+      if (playerState.level > 1) {
+        playerState.level -= 1;
+        playerState.maxExp = Math.max(100, Math.floor(playerState.maxExp / 1.1));
+        playerState.exp += playerState.maxExp;
+      } else {
+        playerState.exp = 0;
+        break;
+      }
+    }
+    while (playerState.exp >= playerState.maxExp) {
+      if (playerState.level >= 999) break;
+      playerState.exp -= playerState.maxExp;
+      playerState.level += 1;
+      playerState.maxExp = Math.floor(playerState.maxExp * 1.1);
+      logMessage(`🎉 LEVEL UP! Level ${playerState.level} 到達！`, 'system');
+    }
+  }
+
+  function saveTargetCountdown() {
+    const titleInput = document.getElementById('input-cd-title').value;
+    const dateInput = document.getElementById('input-cd-date').value;
+    targetCountdown.title = titleInput ? `🎯 目標：${titleInput}` : "🎯 目標カウントダウン";
+    targetCountdown.targetDate = dateInput ? new Date(dateInput).getTime() : null;
+    updateCountdownDisplay();
+    saveGame();
+  }
+
+  function updateCountdownDisplay() {
+    document.getElementById('cd-title-display').innerText = targetCountdown.title;
+    if (!targetCountdown.targetDate) return;
+    const diff = targetCountdown.targetDate - new Date().getTime();
+    if (diff <= 0) return;
+    document.getElementById('cd-days').innerText = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(2, '0');
+    document.getElementById('cd-hours').innerText = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+    document.getElementById('cd-mins').innerText = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+    document.getElementById('cd-secs').innerText = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+  }
+
+  function updateTimerDisplay() {
+    const min = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+    const sec = (timeLeft % 60).toString().padStart(2, '0');
+    document.getElementById('timer-display').innerText = `${min}:${sec}`;
+  }
+
+  function setTimer(minutes) {
+    if (isTimerRunning) toggleTimer();
+    timeLeft = minutes * 60;
+    currentPresetTime = timeLeft;
+    updateTimerDisplay();
+  }
+
+  function toggleTimer() {
+    const btn = document.getElementById('btn-timer');
+    if (!isTimerRunning) {
+      isTimerRunning = true;
+      btn.innerText = "一時停止";
+      btn.className = "btn-timer-ctrl btn-stop";
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          isTimerRunning = false;
+          btn.innerText = "ポモドーロ開始 (+15 EXP / INT+1)";
+          btn.className = "btn-timer-ctrl btn-start";
+          timeLeft = currentPresetTime;
+          updateTimerDisplay();
+          
+          addExp(15);
+          playerState.laziness = Math.max(0, (playerState.laziness || 10) - 3);
+          logMessage(`🎯 集中完了！ +15 EXP`, "system");
+          updateUI();
+          saveGame();
+        }
+      }, 1000);
+    } else {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      btn.innerText = "再開";
+      btn.className = "btn-timer-ctrl btn-start";
+    }
+  }
+
+  function setBaseHere(key) {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition((pos) => {
+      locations[key].lat = pos.coords.latitude;
+      locations[key].lng = pos.coords.longitude;
+      if (map) map.setView([pos.coords.latitude, pos.coords.longitude], 16);
+      renderMapMarkers();
+      saveGame();
+    });
+  }
+
+  function checkIn(key, expReward) {
+    const todayStr = getLocalDateString();
+    if (!playerState.checkedInToday) playerState.checkedInToday = {};
+    if (playerState.checkedInToday[key] === todayStr) return;
+
+    navigator.geolocation.getCurrentPosition((pos) => {
+      playerState.checkedInToday[key] = todayStr;
+      addExp(expReward);
+      updateUI();
+      saveGame();
+    });
+  }
+
+  function switchTab(tabName, event) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById(`tab-${tabName}`).classList.add('active');
+    if (tabName === 'map' && map) setTimeout(() => map.invalidateSize(), 200);
+  }
+
+  function checkLazinessDeath() {
+    if ((playerState.laziness || 0) >= 100) {
+      triggerDeathLoop();
+    }
+  }
+
+  function updateUI() {
+    checkAchievements();
+    const currentTitleObj = ACHIEVEMENTS.find(a => a.id === playerState.equippedTitleId) || ACHIEVEMENTS[0];
+
+    document.getElementById('player-name-display').innerText = playerState.name;
+    document.getElementById('player-title-display').innerText = currentTitleObj.name;
+    document.getElementById('rank-display').innerText = playerState.rank || "E-RANK";
+    document.getElementById('lbl-level').innerText = playerState.level;
+    document.getElementById('lbl-exp').innerText = `${playerState.exp} / ${playerState.maxExp} EXP`;
+    document.getElementById('bar-exp-fill').style.width = `${Math.min(100, (playerState.exp / playerState.maxExp) * 100)}%`;
+
+    const req = getCurrentRankRequirement();
+    ['str', 'int', 'agi', 'sen', 'vit'].forEach(k => {
+      document.getElementById(`target-${k}`).innerText = `/ ${req.minStat}`;
+      const targetInput = document.getElementById(`input-target-${k}`);
+      if (targetInput) targetInput.value = req.minStat;
+    });
+
+    const buffs = currentTitleObj.buff || {};
+    ['str', 'int', 'agi', 'vit', 'sen'].forEach(k => {
+      const baseVal = playerState.stats[k];
+      const buffVal = buffs[k] || 0;
+      document.getElementById(`val-${k}`).innerText = baseVal + buffVal;
+      document.getElementById(`buff-${k}`).innerText = buffVal > 0 ? `(+${buffVal})` : '';
+    });
+
+    const lzsEl = document.getElementById('val-laziness');
+    if (lzsEl) lzsEl.innerText = playerState.laziness !== undefined ? playerState.laziness : 10;
+
+    updateHardcoreUI();
+    checkLazinessDeath();
+  }
+
+  window.onload = () => {
+    const isLoaded = loadGame();
+    if (!isLoaded || !playerState.isInitialized) {
+      document.getElementById('survey-modal').style.display = 'flex';
+    }
+    initBotwMap();
+    setInterval(updateCountdownDisplay, 1000);
+    updateUI();
+    saveGame();
+  };
+</script>
+</body>
+</html>
